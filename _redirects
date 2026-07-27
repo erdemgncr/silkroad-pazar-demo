@@ -1,0 +1,4 @@
+# Cloudflare Pages / Netlify SPA yönlendirmesi.
+# Bu satır olmadan /ilan/13d-sun-blade gibi derin bağlantılar 404 döner:
+# sunucu o yolda dosya arar, oysa yönlendirmeyi uygulama yapıyor.
+/*    /index.html   200

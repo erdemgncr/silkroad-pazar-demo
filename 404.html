@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <base href="/silkroad-pazar-demo/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Silkroad Online ilan pazarı: item, gold, hesap ve karakter al-sat. ISRO, SRO TR ve PVP sunucu tanıtımları, e-pin ve oyun rehberi.">
+  <meta name="theme-color" content="#0B0E14">
+  <meta name="robots" content="index, follow">
+
+  <!-- Sosyal paylaşım kartı -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Silkroad Pazar">
+  <meta property="og:title" content="Silkroad Pazar — İlan Pazarı, Sunucu Tanıtımları ve E-Pin">
+  <meta property="og:description" content="İtem, gold ve hesabını güvenle al-sat. Sunucu tanıtımlarını cap ve rate filtresiyle karşılaştır.">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:image" content="og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="og-image.jpg">
+
+  <!-- iOS -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Silkroad Pazar">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <!-- Açılış ekranındaki logo Flutter yüklenmeden görünüyor; erken indir. -->
+  <link rel="preload" as="image" href="boot-logo.webp">
+
+  <title>Silkroad Pazar — İlan Pazarı, Sunucu Tanıtımları ve E-Pin</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #0B0E14;
+      overscroll-behavior: none;
+    }
+
+    /*
+      Açılış ekranı. Renkleri ve yerleşimi Dart tarafındaki temayla birebir
+      tutuyoruz; aksi halde motor yüklenirken iki farklı ekran arka arkaya
+      görünüyor ve "çift yükleme" hissi oluşuyor.
+    */
+    #boot {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      background: linear-gradient(135deg, #0B0E14 0%, #141B2B 50%, #0B0E14 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      transition: opacity .25s ease;
+      z-index: 9999;
+    }
+
+    #boot.done { opacity: 0; pointer-events: none; }
+
+    .boot-logo {
+      width: 112px;
+      height: 112px;
+      display: block;
+      /* Yüklenirken sıçrama olmasın diye ölçü baştan sabit. */
+      object-fit: contain;
+    }
+
+    .boot-spinner {
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(232, 181, 75, .22);
+      border-top-color: #E8B54B;
+      border-radius: 50%;
+      animation: boot-spin .8s linear infinite;
+    }
+
+    @keyframes boot-spin { to { transform: rotate(360deg); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .boot-spinner { animation-duration: 2.4s; }
+    }
+  </style>
+</head>
+<body>
+  <div id="boot">
+    <img class="boot-logo" src="boot-logo.webp" width="112" height="112"
+         alt="Silkroad Pazar">
+    <div class="boot-spinner"></div>
+  </div>
+
+  <script>
+    // Flutter ilk kareyi çizince açılış ekranını kaldır.
+    window.addEventListener('flutter-first-frame', function () {
+      var boot = document.getElementById('boot');
+      if (!boot) return;
+      boot.classList.add('done');
+      setTimeout(function () { boot.remove(); }, 300);
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
