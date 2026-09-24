@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+/*
+ * Tema token'ları. Her site kök elemanına data-theme ve renk değişkenleri basılır;
+ * bileşenler yalnızca bu token'ları kullanır, böylece aynı bileşen 5 temada farklı görünür.
+ */
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-fg: var(--c-fg);
+  --color-muted: var(--c-muted);
+  --color-line: var(--c-line);
+  --color-soft: var(--c-soft);
+  --color-card: var(--c-card);
+  --color-primary: var(--c-primary);
+  --color-primary-fg: var(--c-primary-fg);
+  --color-accent: var(--c-accent);
+  --color-accent-fg: var(--c-accent-fg);
+  --color-sale: var(--c-sale);
+  --font-body: var(--f-body);
+  --font-heading: var(--f-heading);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --radius-theme: var(--r-theme);
+  --radius-theme-lg: var(--r-theme-lg);
+}
+
+:root {
+  --c-bg: #ffffff;
+  --c-fg: #111111;
+  --c-muted: #6b6b6b;
+  --c-line: #e5e5e5;
+  --c-soft: #f5f5f5;
+  --c-card: #ffffff;
+  --c-primary: #111111;
+  --c-primary-fg: #ffffff;
+  --c-accent: #ff4d00;
+  --c-accent-fg: #ffffff;
+  --c-sale: #e11d2e;
+  --f-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --r-theme: 0px;
+  --r-theme-lg: 0px;
+}
+
+[data-theme="urban"] {
+  --c-bg: #ffffff;
+  --c-fg: #111111;
+  --c-muted: #707072;
+  --c-line: #e5e5e5;
+  --c-soft: #f5f5f5;
+  --c-card: #ffffff;
+  --f-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-archivo), var(--font-inter), sans-serif;
+  --r-theme: 0px;
+  --r-theme-lg: 0px;
+}
+
+[data-theme="arena"] {
+  --c-bg: #ffffff;
+  --c-fg: #0f172a;
+  --c-muted: #64748b;
+  --c-line: #e2e8f0;
+  --c-soft: #f1f5f9;
+  --c-card: #ffffff;
+  --f-body: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --r-theme: 8px;
+  --r-theme-lg: 14px;
+}
+
+[data-theme="neon"] {
+  --c-bg: #0a0a0a;
+  --c-fg: #f5f5f5;
+  --c-muted: #a3a3a3;
+  --c-line: #262626;
+  --c-soft: #151515;
+  --c-card: #111111;
+  --f-body: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-anton), var(--font-grotesk), sans-serif;
+  --r-theme: 2px;
+  --r-theme-lg: 4px;
+  color-scheme: dark;
+}
+
+[data-theme="studio"] {
+  --c-bg: #f7f3ec;
+  --c-fg: #1c1917;
+  --c-muted: #78716c;
+  --c-line: #e4dccf;
+  --c-soft: #efe9df;
+  --c-card: #fbf8f3;
+  --f-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-fraunces), Georgia, serif;
+  --r-theme: 0px;
+  --r-theme-lg: 0px;
+}
+
+[data-theme="pulse"] {
+  --c-bg: #ffffff;
+  --c-fg: #0f172a;
+  --c-muted: #64748b;
+  --c-line: #e5e7eb;
+  --c-soft: #f3f4f6;
+  --c-card: #ffffff;
+  --f-body: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --r-theme: 16px;
+  --r-theme-lg: 28px;
+}
+
+.store {
+  background: var(--c-bg);
+  color: var(--c-fg);
+  font-family: var(--f-body);
+}
+
+.container-x {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+@media (min-width: 768px) {
+  .container-x {
+    padding-inline: 24px;
+  }
+}
+@media (min-width: 1280px) {
+  .container-x {
+    padding-inline: 40px;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
+@keyframes fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-in {
+  animation: fade-slide 0.25s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-in {
+    animation: none;
+  }
+}
+
+/* Uzun metinler (statik sayfalar, blog, ürün açıklaması) */
+.prose-store h2 {
+  font-family: var(--f-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 1.75rem 0 0.6rem;
+  line-height: 1.3;
+}
+.prose-store h3 {
+  font-weight: 700;
+  margin: 1.25rem 0 0.4rem;
+}
+.prose-store p {
+  margin: 0 0 0.9rem;
+  line-height: 1.75;
+  color: color-mix(in srgb, var(--c-fg) 82%, transparent);
+}
+.prose-store ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0 0 1rem;
+}
+.prose-store ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+  margin: 0 0 1rem;
+}
+.prose-store li {
+  margin: 0.3rem 0;
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--c-fg) 82%, transparent);
+}
+.prose-store a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-store table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin: 0.5rem 0 1.25rem;
+}
+.prose-store th,
+.prose-store td {
+  border: 1px solid var(--c-line);
+  padding: 0.5rem 0.65rem;
+  text-align: center;
+}
+.prose-store th {
+  background: var(--c-soft);
+  font-weight: 700;
+}
+
+[data-theme="urban"] .h-display,
+[data-theme="neon"] .h-display {
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+[data-theme="neon"] .h-display {
+  letter-spacing: 0.01em;
+}
+[data-theme="studio"] .h-display {
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+input[type="range"] {
+  accent-color: var(--c-primary);
+}
