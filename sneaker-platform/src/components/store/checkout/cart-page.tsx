@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { clsx } from "clsx";
 import { CircleAlert, Lock, Minus, Plus, ShieldCheck, ShoppingBag, Tag, Trash2, Truck, X } from "lucide-react";
 import { formatPrice } from "@/lib/format";
-import type { ThemeKey } from "@/themes/registry";
+import { styleOf, type StyleKey, type ThemeKey } from "@/themes/registry";
 import { useStore } from "../providers";
 import { FreeShippingBar } from "../overlays";
 import { usePricing } from "./use-pricing";
@@ -32,7 +32,8 @@ export function useCoupon() {
   return [coupon, set] as const;
 }
 
-export function Summary({ pricing, loading, children, variant }: { pricing: ReturnType<typeof usePricing>["pricing"]; loading: boolean; children?: React.ReactNode; variant: ThemeKey }) {
+export function Summary({ pricing, loading, children, variant: theme }: { pricing: ReturnType<typeof usePricing>["pricing"]; loading: boolean; children?: React.ReactNode; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   return (
     <div className={clsx("rounded-theme-lg p-5 md:p-6", variant === "neon" ? "bg-card ring-1 ring-line" : "bg-soft")}>
       <p className="mb-4 font-heading text-lg font-bold">Sipariş Özeti</p>
@@ -121,7 +122,8 @@ export function CouponBox({ coupon, setCoupon, error, applied }: { coupon: strin
   );
 }
 
-export function CartPage({ variant }: { variant: ThemeKey }) {
+export function CartPage({ variant: theme }: { variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const { cart, setQuantity, removeFromCart, hydrated } = useStore();
   const [coupon, setCoupon] = useCoupon();
   const { pricing, loading } = usePricing(coupon);
@@ -212,7 +214,7 @@ export function CartPage({ variant }: { variant: ThemeKey }) {
         </Link>
       </div>
       <aside className="lg:sticky lg:top-28 lg:self-start">
-        <Summary pricing={pricing} loading={loading} variant={variant}>
+        <Summary pricing={pricing} loading={loading} variant={theme}>
           <CouponBox coupon={coupon} setCoupon={setCoupon} error={pricing?.couponError ?? null} applied={pricing?.coupon?.code ?? null} />
           <Link
             href="/odeme"

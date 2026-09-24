@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { clsx } from "clsx";
+import { styleOf } from "@/themes/registry";
 import { requireSiteWithCatalog } from "@/lib/store-context";
 import { toCards } from "@/lib/store-data";
 import { Breadcrumbs } from "@/components/store/breadcrumbs";
@@ -22,7 +23,7 @@ export default async function UpcomingPage({ params }: PageProps<"/s/[site]/yaki
     all.filter((p) => p.releaseDate && p.releaseDate > new Date()).sort((a, b) => +a.releaseDate! - +b.releaseDate!),
     all,
   );
-  const v = site.theme;
+  const v = styleOf(site.theme);
   return (
     <div className="container-x py-8 md:py-10">
       <Breadcrumbs

@@ -1,4 +1,5 @@
 import "server-only";
+import { isThemeKey, THEMES } from "@/themes/registry";
 import { eq } from "drizzle-orm";
 import { cache as reactCache } from "react";
 import { db, schema } from "@/db";
@@ -25,6 +26,8 @@ export type SiteContext = {
   requestHost: string;
   isPreview: boolean;
   shopierConnected: boolean;
+  /** Panelden "bu temayla önizle" ile açıldıysa true (tema henüz uygulanmadı). */
+  themePreview?: boolean;
 };
 
 export const PREVIEW_PREFIX = "_preview.";
@@ -77,9 +80,15 @@ export const resolveSite = reactCache(async (rawKey: string): Promise<SiteContex
   const key = decodeURIComponent(rawKey).toLowerCase();
   const all = await loadAllSites();
   if (key.startsWith(PREVIEW_PREFIX)) {
-    const slug = key.slice(PREVIEW_PREFIX.length);
+    // "_preview.slug" ya da tema denemesi için "_preview.slug~tema"
+    const [slug, themeOverride] = key.slice(PREVIEW_PREFIX.length).split("~");
     const row = all.find((s) => s.slug === slug);
-    return row ? toContext(row, key, true) : null;
+    if (!row) return null;
+    const ctx = toContext(row, key, true);
+    if (themeOverride && isThemeKey(themeOverride) && themeOverride !== ctx.theme) {
+      return { ...ctx, theme: themeOverride, themePreview: true, settings: { ...ctx.settings, colors: { ...THEMES[themeOverride].defaults } } };
+    }
+    return ctx;
   }
   const host = key.replace(/\.$/, "");
   const byDomain = all.find((s) => s.domains.some((d) => d.hostname === host || `www.${d.hostname}` === host));

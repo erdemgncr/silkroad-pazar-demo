@@ -20,6 +20,7 @@ import { Tabs } from "@/components/store/interactive";
 import { RichText } from "@/components/store/rich-text";
 import type { CatalogProduct } from "@/lib/catalog";
 import type { SiteContext } from "@/lib/site";
+import { styleOf } from "@/themes/registry";
 
 function addBusinessDays(from: Date, n: number): Date {
   const d = new Date(from);
@@ -86,7 +87,8 @@ export async function generateMetadata(props: PageProps<"/s/[site]/urun/[slug]">
 }
 
 function Details({ site, p, copy }: { site: SiteContext; p: CatalogProduct; copy: ReturnType<typeof productCopy> }) {
-  const v = site.theme;
+  const theme = site.theme;
+  const v = styleOf(theme);
   const s = site.settings;
   const sections = [
     {
@@ -141,14 +143,14 @@ function Details({ site, p, copy }: { site: SiteContext; p: CatalogProduct; copy
     return (
       <section className="container-x py-10">
         <div className={clsx("border border-line p-5 md:p-8", v === "pulse" ? "rounded-theme-lg" : "rounded-theme-lg")}>
-          <Tabs variant={v} tabs={sections} />
+          <Tabs variant={theme} tabs={sections} />
         </div>
       </section>
     );
   }
   return (
     <section className="container-x py-10">
-      <div className="mx-auto max-w-4xl divide-y divide-line border-y border-line">
+      <div className={clsx("mx-auto max-w-4xl divide-y divide-line border-y border-line", theme === "brut" && "brut-box divide-y-2 border-0 bg-card px-5")}>
         {sections.map((sec, i) => (
           <details key={sec.label} className="group" open={i === 0}>
             <summary className={clsx("flex cursor-pointer list-none items-center justify-between py-5 font-semibold", v === "studio" ? "font-heading text-xl font-normal" : "text-base", v === "urban" && "uppercase tracking-wide", v === "neon" && "font-heading text-xl uppercase")}>
@@ -166,6 +168,7 @@ function Details({ site, p, copy }: { site: SiteContext; p: CatalogProduct; copy
 export default async function ProductPage(props: PageProps<"/s/[site]/urun/[slug]">) {
   const { site, all, p, copy } = await load(props);
   const v = site.theme;
+  const fam = styleOf(v);
   const s = site.settings;
   const siblings = colorSiblings(all, p);
   const related = relatedProducts(all, p, 12);
@@ -181,22 +184,19 @@ export default async function ProductPage(props: PageProps<"/s/[site]/urun/[slug
   ) as [string, string];
   const images = p.images.map((im) => ({ url: im.url, alt: im.alt ? `${copy.imageAlt} - ${im.alt.split(" ").slice(-2).join(" ")}` : copy.imageAlt }));
 
-  const gridCls =
-    v === "urban"
-      ? "lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]"
-      : v === "studio"
-        ? "lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]"
-        : "lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]";
+  const gridCls = {
+    urban: "lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]",
+    studio: "lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]",
+    metro: "lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] xl:gap-16",
+    brut: "lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]",
+    luxe: "lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] xl:gap-20",
+  }[v as string] ?? "lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]";
+  const volt = v === "volt";
+  void fam;
 
-  return (
-    <>
-      <div className="container-x pt-5">
-        <Breadcrumbs items={crumbs} />
-      </div>
-      <div className={clsx("container-x mt-5 grid gap-8 lg:gap-12", gridCls)}>
-        <Gallery images={images} variant={v} />
-        <div className="lg:sticky lg:top-28 lg:self-start">
+  const buyBox = (
           <BuyBox
+            key={p.id}
             product={card}
             h1={copy.h1}
             subtitle={`${GENDER_LABEL[p.gender]} ${cat?.singular ?? ""} · ${p.colorName}`}
@@ -211,6 +211,8 @@ export default async function ProductPage(props: PageProps<"/s/[site]/urun/[slug
             whatsapp={s.contact.whatsapp}
             deliveryWindow={deliveryWindow}
           />
+  );
+  const chips = (
           <div className="mt-6 flex flex-wrap gap-2 text-xs">
             <Link href={`/seri/${p.seriesSlug}`} className="rounded-full bg-soft px-3 py-1.5 hover:bg-line">
               Tüm {p.brand} {p.model} modelleri
@@ -224,8 +226,32 @@ export default async function ProductPage(props: PageProps<"/s/[site]/urun/[slug
               </Link>
             )}
           </div>
-        </div>
+  );
+
+  return (
+    <>
+      <div className={clsx(volt ? "px-4 pt-4 lg:px-5" : "container-x pt-5")}>
+        <Breadcrumbs items={crumbs} />
       </div>
+      {volt ? (
+        <div className="relative mt-4">
+          <div className="px-4 md:px-0">
+            <Gallery images={images} variant={v} />
+          </div>
+          <div className="mt-6 px-4 md:mt-8 md:px-6 lg:absolute lg:right-6 lg:top-6 lg:mt-0 lg:w-[410px] lg:px-0 xl:right-8">
+            <div className="panel-dark-lg lg:max-h-[calc(100vh-190px)] lg:overflow-y-auto lg:p-6 lg:shadow-2xl">{buyBox}</div>
+            <div className="lg:hidden">{chips}</div>
+          </div>
+        </div>
+      ) : (
+        <div className={clsx("container-x mt-5 grid gap-8 lg:gap-12", gridCls)}>
+          <Gallery images={images} variant={v} />
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            {buyBox}
+            {chips}
+          </div>
+        </div>
+      )}
 
       <Details site={site} p={p} copy={copy} />
 

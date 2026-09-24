@@ -6,6 +6,8 @@ import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { requireMerchant, requirePanel } from "@/lib/panel";
+import { sendMail, testMailHtml } from "@/lib/mailer";
+import { notify } from "@/lib/notify";
 import { createSite, normalizeHostname } from "@/lib/site-factory";
 import { invalidate, invalidateAll } from "@/lib/cache";
 import { isThemeKey, THEMES } from "@/themes/registry";
@@ -24,7 +26,10 @@ async function ownedSite(siteId: number) {
 const RESERVED = new Set(["www", "panel", "api", "admin", "app", "static", "mail", "shop"]);
 
 export async function createSiteAction(_: FormState, form: FormData): Promise<FormState> {
-  const ctx = await requireMerchant();
+  const base = await requireMerchant();
+  // Platform yöneticisi siteyi seçtiği satıcı adına oluşturabilir.
+  const chosen = base.isPlatform ? Number(form.get("merchantId") || 0) : 0;
+  const ctx = chosen ? { ...base, merchant: (await db.query.merchants.findFirst({ where: eq(schema.merchants.id, chosen) })) ?? base.merchant } : base;
   const name = String(form.get("name") ?? "").trim();
   const theme = String(form.get("theme") ?? "");
   const slug = slugify(String(form.get("slug") ?? "") || name);
@@ -39,6 +44,7 @@ export async function createSiteAction(_: FormState, form: FormData): Promise<Fo
   if (domain && (await db.query.siteDomains.findFirst({ where: eq(schema.siteDomains.hostname, domain) }))) return { error: "Bu alan adı başka bir siteye bağlı." };
   const site = await createSite({ merchantId: ctx.merchant.id, name, slug, theme, status: "draft", domains: domain ? [domain] : [], city: city || undefined });
   invalidate("sites:");
+  await notify({ merchantId: null, type: "merchant", title: `Yeni site: ${name}`, body: `${ctx.merchant.name} yeni bir site oluşturdu (${THEMES[theme].name} tema).`, link: `/panel/siteler/${site.id}` });
   redirect(`/panel/siteler/${site.id}?yeni=1`);
 }
 
@@ -49,12 +55,13 @@ const generalSchema = z.object({
 });
 
 export async function updateSiteGeneral(siteId: number, _: FormState, form: FormData): Promise<FormState> {
-  const { site } = await ownedSite(siteId);
+  const { site, ctx } = await ownedSite(siteId);
   const parsed = generalSchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return { error: "Bilgileri kontrol edin." };
+  const merchantId = ctx.isPlatform ? Number(form.get("merchantId") || site.merchantId) : site.merchantId;
   await db
     .update(schema.sites)
-    .set({ name: parsed.data.name, status: parsed.data.status, theme: parsed.data.theme as keyof typeof THEMES, updatedAt: new Date() })
+    .set({ name: parsed.data.name, status: parsed.data.status, theme: parsed.data.theme as keyof typeof THEMES, merchantId, updatedAt: new Date() })
     .where(eq(schema.sites.id, site.id));
   invalidateAll();
   revalidatePath(`/panel/siteler/${site.id}`);
@@ -175,4 +182,168 @@ export async function deleteSite(siteId: number, _: FormState, form: FormData): 
   await db.delete(schema.sites).where(eq(schema.sites.id, site.id));
   invalidateAll();
   redirect("/panel/siteler");
+}
+
+/* ------------------------------------------------------------------ */
+/* Tema değiştir (Temalar sayfasından)                                  */
+/* ------------------------------------------------------------------ */
+
+export async function applyTheme(siteId: number, theme: string, withColors: boolean) {
+  const { site } = await ownedSite(siteId);
+  if (!isThemeKey(theme)) throw new Error("Geçersiz tema");
+  const settings = withColors ? { ...site.settings, colors: { ...THEMES[theme].defaults } } : site.settings;
+  await db.update(schema.sites).set({ theme, settings, updatedAt: new Date() }).where(eq(schema.sites.id, site.id));
+  invalidateAll();
+  revalidatePath("/panel/temalar");
+  revalidatePath(`/panel/siteler/${site.id}`);
+  return { ok: true, message: `${site.name} artık ${THEMES[theme].name} temasını kullanıyor.` };
+}
+
+/* ------------------------------------------------------------------ */
+/* SEO                                                                  */
+/* ------------------------------------------------------------------ */
+
+export async function regenerateSeoSeed(siteId: number) {
+  const { site } = await ownedSite(siteId);
+  const seed = Math.floor(Math.random() * 100000);
+  await db.update(schema.sites).set({ settings: { ...site.settings, seo: { ...site.settings.seo, seed } }, updatedAt: new Date() }).where(eq(schema.sites.id, site.id));
+  invalidateAll();
+  revalidatePath(`/panel/siteler/${site.id}`);
+  return { ok: true, message: "Ürün ve kategori metinleri bu site için yeniden üretildi." };
+}
+
+export async function saveCollectionSeo(siteId: number, _: FormState, form: FormData): Promise<FormState> {
+  const { site } = await ownedSite(siteId);
+  const key = String(form.get("key") ?? "").trim();
+  if (!key) return { error: "Kategori seçin." };
+  const v = (k: string) => String(form.get(k) ?? "").trim() || null;
+  const row = { h1: v("h1"), metaTitle: v("metaTitle"), metaDescription: v("metaDescription"), intro: v("intro"), content: v("content") };
+  if (Object.values(row).every((x) => !x)) {
+    await db.delete(schema.collectionSeo).where(and(eq(schema.collectionSeo.siteId, site.id), eq(schema.collectionSeo.key, key)));
+  } else {
+    await db
+      .insert(schema.collectionSeo)
+      .values({ siteId: site.id, key, ...row })
+      .onConflictDoUpdate({ target: [schema.collectionSeo.siteId, schema.collectionSeo.key], set: { ...row, updatedAt: new Date() } });
+  }
+  invalidate(`colseo:${site.id}:`);
+  revalidatePath(`/panel/siteler/${site.id}`);
+  return { ok: true, message: "Kategori SEO metni kaydedildi. Boş bırakılan alanlarda otomatik metin kullanılır." };
+}
+
+/* ------------------------------------------------------------------ */
+/* E-posta (SMTP)                                                       */
+/* ------------------------------------------------------------------ */
+
+export async function updateSiteMail(siteId: number, _: FormState, form: FormData): Promise<FormState> {
+  const { site } = await ownedSite(siteId);
+  const str = (k: string) => String(form.get(k) ?? "").trim();
+  const enabled = form.get("enabled") === "on";
+  const current = await db.query.siteMailSettings.findFirst({ where: eq(schema.siteMailSettings.siteId, site.id) });
+  const port = Number(str("port") || 587);
+  if (enabled && (!str("host") || !str("fromEmail"))) return { error: "SMTP sunucusu ve gönderen e-posta adresi zorunludur." };
+  if (str("fromEmail") && !/^\S+@\S+\.\S+$/.test(str("fromEmail"))) return { error: "Gönderen e-posta adresi geçerli değil." };
+  if (str("notifyEmail") && !/^\S+@\S+\.\S+$/.test(str("notifyEmail"))) return { error: "Bildirim e-posta adresi geçerli değil." };
+  const values = {
+    enabled,
+    host: str("host") || null,
+    port: Number.isFinite(port) ? port : 587,
+    secure: form.get("secure") === "on" || port === 465,
+    username: str("username") || null,
+    // Şifre alanı boş bırakılırsa mevcut şifre korunur.
+    password: str("password") || current?.password || null,
+    fromEmail: str("fromEmail") || null,
+    fromName: str("fromName") || null,
+    replyTo: str("replyTo") || null,
+    notifyEmail: str("notifyEmail") || null,
+    updatedAt: new Date(),
+  };
+  await db.insert(schema.siteMailSettings).values({ siteId: site.id, ...values }).onConflictDoUpdate({ target: schema.siteMailSettings.siteId, set: values });
+  revalidatePath(`/panel/siteler/${site.id}`);
+  return { ok: true, message: enabled ? "SMTP ayarları kaydedildi. Test e-postası göndererek doğrulayın." : "Kaydedildi. Site, platformun e-posta sunucusunu kullanacak." };
+}
+
+export async function sendSiteTestMail(siteId: number, _: FormState, form: FormData): Promise<FormState> {
+  const { site } = await ownedSite(siteId);
+  const to = String(form.get("to") ?? "").trim();
+  if (!/^\S+@\S+\.\S+$/.test(to)) return { error: "Geçerli bir e-posta adresi girin." };
+  const r = await sendMail({ to, subject: `${site.name} - Test e-postası`, html: testMailHtml(site.name, "site SMTP"), template: "test", siteId: site.id, merchantId: site.merchantId, fromName: site.name });
+  revalidatePath(`/panel/siteler/${site.id}`);
+  if (r.status === "sent") return { ok: true, message: `Test e-postası ${to} adresine gönderildi.` };
+  if (r.status === "logged") return { error: "Hiçbir SMTP sunucusu tanımlı değil; e-posta yalnızca sunucu günlüğüne yazıldı." };
+  return { error: `Gönderilemedi: ${r.error}` };
+}
+
+/* ------------------------------------------------------------------ */
+/* Statik sayfalar                                                      */
+/* ------------------------------------------------------------------ */
+
+export async function savePageOverride(siteId: number, slug: string, _: FormState, form: FormData): Promise<FormState> {
+  const { site } = await ownedSite(siteId);
+  const v = (k: string) => String(form.get(k) ?? "").trim() || null;
+  const row = { title: v("title"), metaDescription: v("metaDescription"), content: v("content") };
+  if (Object.values(row).every((x) => !x)) {
+    await db.delete(schema.sitePages).where(and(eq(schema.sitePages.siteId, site.id), eq(schema.sitePages.slug, slug)));
+  } else {
+    await db
+      .insert(schema.sitePages)
+      .values({ siteId: site.id, slug, ...row })
+      .onConflictDoUpdate({ target: [schema.sitePages.siteId, schema.sitePages.slug], set: { ...row, updatedAt: new Date() } });
+  }
+  invalidate(`page:${site.id}:`);
+  revalidatePath(`/panel/siteler/${site.id}`);
+  return { ok: true, message: "Sayfa kaydedildi." };
+}
+
+export async function resetPageOverride(siteId: number, slug: string) {
+  const { site } = await ownedSite(siteId);
+  await db.delete(schema.sitePages).where(and(eq(schema.sitePages.siteId, site.id), eq(schema.sitePages.slug, slug)));
+  invalidate(`page:${site.id}:`);
+  revalidatePath(`/panel/siteler/${site.id}`);
+  return { ok: true, message: "Varsayılan metne dönüldü." };
+}
+
+/* ------------------------------------------------------------------ */
+/* Blog                                                                 */
+/* ------------------------------------------------------------------ */
+
+export async function saveBlogPost(siteId: number, postId: number | null, _: FormState, form: FormData): Promise<FormState> {
+  const { site } = await ownedSite(siteId);
+  const str = (k: string) => String(form.get(k) ?? "").trim();
+  const title = str("title");
+  if (title.length < 5) return { error: "Başlık en az 5 karakter olmalı." };
+  const slug = slugify(str("slug") || title);
+  const clash = await db.query.blogPosts.findFirst({ where: and(eq(schema.blogPosts.siteId, site.id), eq(schema.blogPosts.slug, slug)) });
+  if (clash && clash.id !== postId) return { error: "Bu adresle başka bir yazı var." };
+  const publishedAt = str("publishedAt") ? new Date(str("publishedAt")) : new Date();
+  const values = {
+    title,
+    slug,
+    excerpt: str("excerpt"),
+    content: str("content"),
+    cover: str("cover") || null,
+    metaTitle: str("metaTitle") || null,
+    metaDescription: str("metaDescription") || null,
+    status: (str("status") === "draft" ? "draft" : "published") as "draft" | "published",
+    publishedAt: Number.isNaN(publishedAt.getTime()) ? new Date() : publishedAt,
+    updatedAt: new Date(),
+  };
+  if (postId) {
+    await db.update(schema.blogPosts).set(values).where(and(eq(schema.blogPosts.id, postId), eq(schema.blogPosts.siteId, site.id)));
+  } else {
+    const [row] = await db.insert(schema.blogPosts).values({ siteId: site.id, ...values }).returning();
+    invalidate(`posts:${site.id}`);
+    redirect(`/panel/siteler/${site.id}?sekme=blog&yazi=${row.id}&kaydedildi=1`);
+  }
+  invalidate(`posts:${site.id}`);
+  revalidatePath(`/panel/siteler/${site.id}`);
+  return { ok: true, message: "Yazı kaydedildi." };
+}
+
+export async function deleteBlogPost(siteId: number, postId: number) {
+  const { site } = await ownedSite(siteId);
+  await db.delete(schema.blogPosts).where(and(eq(schema.blogPosts.id, postId), eq(schema.blogPosts.siteId, site.id)));
+  invalidate(`posts:${site.id}`);
+  revalidatePath(`/panel/siteler/${site.id}`);
+  return { ok: true, message: "Yazı silindi." };
 }

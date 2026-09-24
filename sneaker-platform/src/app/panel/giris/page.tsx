@@ -1,38 +1,30 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LoginForm } from "./login-form";
+import { AuthShell } from "@/components/panel/auth-shell";
+import { getPlatformSetting } from "@/lib/platform-settings";
 
 export const metadata: Metadata = { title: "Panel Girişi", robots: { index: false, follow: false } };
+export const dynamic = "force-dynamic";
 
-export default function PanelLoginPage() {
+export default async function PanelLoginPage({ searchParams }: PageProps<"/panel/giris">) {
+  const sp = await searchParams;
+  const general = await getPlatformSetting("general");
   return (
-    <div className="grid min-h-screen bg-zinc-950 font-sans lg:grid-cols-2">
-      <div className="hidden flex-col justify-between bg-gradient-to-br from-zinc-900 via-zinc-950 to-black p-12 text-white lg:flex">
-        <p className="text-xl font-black tracking-tight">SNEAKER<span className="text-orange-500">OS</span></p>
-        <div>
-          <h1 className="text-4xl font-bold leading-tight">
-            Shopier satıcıları için
-            <br />
-            çok siteli sneaker mağaza platformu
-          </h1>
-          <ul className="mt-8 space-y-3 text-sm text-zinc-400">
-            <li>• Dakikalar içinde site kur, 5 hazır tema</li>
-            <li>• Katalog havuzundan görselleriyle hazır ürün ekle</li>
-            <li>• Shopier ile ödeme, ürün ve sipariş senkronu</li>
-            <li>• Her siteye özgün SEO metinleri ve yapay zeka açıklamaları</li>
-          </ul>
-        </div>
-        <p className="text-xs text-zinc-600">© {new Date().getFullYear()} SneakerOS</p>
+    <AuthShell title="Panele giriş yap" subtitle="Satıcı ya da platform hesabınla giriş yapabilirsin.">
+      {sp.askida === "1" && <p className="mt-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-700">Hesabınız askıya alınmış. Lütfen destek ekibiyle iletişime geçin.</p>}
+      {sp.sifirlandi === "1" && <p className="mt-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">Şifren değiştirildi. Yeni şifrenle giriş yapabilirsin.</p>}
+      <LoginForm />
+      <div className="mt-4 flex items-center justify-between text-sm">
+        <Link href="/panel/sifremi-unuttum" className="text-zinc-600 underline">
+          Şifremi unuttum
+        </Link>
+        {general.signupOpen && (
+          <Link href="/panel/kayit" className="font-semibold underline">
+            Ücretsiz dene
+          </Link>
+        )}
       </div>
-      <div className="grid place-items-center bg-white p-6">
-        <div className="w-full max-w-sm">
-          <p className="text-xl font-black tracking-tight lg:hidden">
-            SNEAKER<span className="text-orange-500">OS</span>
-          </p>
-          <h2 className="mt-6 text-2xl font-bold text-zinc-900">Panele giriş yap</h2>
-          <p className="mt-1 text-sm text-zinc-500">Satıcı ya da platform hesabınla giriş yapabilirsin.</p>
-          <LoginForm />
-        </div>
-      </div>
-    </div>
+    </AuthShell>
   );
 }

@@ -38,11 +38,44 @@ export const merchants = pgTable("merchants", {
   productLimit: integer("product_limit").notNull().default(200),
   aiMonthlyLimit: integer("ai_monthly_limit").notNull().default(100),
   aiUsedThisMonth: integer("ai_used_this_month").notNull().default(0),
+  /** aiUsedThisMonth sayacının ait olduğu ay (YYYY-MM); ay değişince sayaç sıfırlanır. */
+  aiUsagePeriod: text("ai_usage_period"),
+  /** Platform yöneticisinin satıcıyla ilgili iç notu. */
+  adminNote: text("admin_note"),
   /** Satıcının kendi Google Gemini API anahtarı (boşsa platform anahtarı kullanılır). */
   geminiApiKey: text("gemini_api_key"),
+  /** Yeni sipariş, mesaj vb. bildirimlerin gideceği e-posta. */
+  notifyEmail: text("notify_email"),
+  notifyPrefs: jsonb("notify_prefs")
+    .$type<{ newOrder: boolean; contactMessage: boolean; lowStock: boolean; syncError: boolean; dailySummary: boolean }>()
+    .notNull()
+    .default({ newOrder: true, contactMessage: true, lowStock: true, syncError: true, dailySummary: false }),
+  companyInfo: jsonb("company_info").$type<{ legalName?: string; taxOffice?: string; taxNumber?: string; address?: string; phone?: string }>().notNull().default({}),
   trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
+  /** Ödenmiş abonelik bitiş tarihi. */
+  paidUntil: timestamp("paid_until", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Satıcının platforma ödediği paket (abonelik) faturaları. */
+export const subscriptionInvoices = pgTable(
+  "subscription_invoices",
+  {
+    id: serial("id").primaryKey(),
+    merchantId: integer("merchant_id").notNull().references(() => merchants.id, { onDelete: "cascade" }),
+    plan: text("plan").$type<PlanKey>().notNull(),
+    months: integer("months").notNull(),
+    /** Kuruş cinsinden toplam tutar. */
+    amount: integer("amount").notNull(),
+    status: text("status").$type<"pending" | "paid" | "failed" | "cancelled">().notNull().default("pending"),
+    provider: text("provider").$type<"shopier" | "demo" | "manual">().notNull().default("shopier"),
+    paymentRef: text("payment_ref"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+  },
+  (t) => [index("subscription_invoices_merchant_idx").on(t.merchantId, t.createdAt)],
+);
 
 export const platformSettings = pgTable("platform_settings", {
   key: text("key").primaryKey(),
@@ -394,8 +427,60 @@ export const stockAlerts = pgTable("stock_alerts", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/** Site bazlı e-posta (SMTP) ayarları. Boşsa platform SMTP ayarı kullanılır. */
+export const siteMailSettings = pgTable("site_mail_settings", {
+  siteId: integer("site_id").primaryKey().references(() => sites.id, { onDelete: "cascade" }),
+  enabled: boolean("enabled").notNull().default(false),
+  host: text("host"),
+  port: integer("port").notNull().default(587),
+  secure: boolean("secure").notNull().default(false),
+  username: text("username"),
+  password: text("password"),
+  fromEmail: text("from_email"),
+  fromName: text("from_name"),
+  replyTo: text("reply_to"),
+  /** Bu siteye ait sipariş/mesaj bildirimlerinin gideceği adres (boşsa satıcının bildirim adresi). */
+  notifyEmail: text("notify_email"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: serial("id").primaryKey(),
+    /** Boşsa platform (süper admin) bildirimi. */
+    merchantId: integer("merchant_id").references(() => merchants.id, { onDelete: "cascade" }),
+    siteId: integer("site_id").references(() => sites.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull().default(""),
+    link: text("link"),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("notifications_merchant_idx").on(t.merchantId, t.readAt)],
+);
+
+export const emailLogs = pgTable(
+  "email_logs",
+  {
+    id: serial("id").primaryKey(),
+    merchantId: integer("merchant_id").references(() => merchants.id, { onDelete: "cascade" }),
+    siteId: integer("site_id").references(() => sites.id, { onDelete: "set null" }),
+    to: text("to").notNull(),
+    subject: text("subject").notNull(),
+    template: text("template").notNull(),
+    status: text("status").$type<"sent" | "failed" | "logged">().notNull(),
+    transport: text("transport").notNull().default("console"),
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("email_logs_merchant_idx").on(t.merchantId, t.createdAt)],
+);
+
 export type Site = typeof sites.$inferSelect;
 export type Merchant = typeof merchants.$inferSelect;
+export type SubscriptionInvoice = typeof subscriptionInvoices.$inferSelect;
 export type ShopierAccount = typeof shopierAccounts.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type Order = typeof orders.$inferSelect;

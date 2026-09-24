@@ -36,6 +36,9 @@ export async function proxy(req: NextRequest) {
   const url = req.nextUrl;
   const host = (req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "").toLowerCase().split(",")[0].trim();
 
+  // SSL onay uç noktası tüm alan adlarında (Caddy iç ağdan çağırır) doğrudan çalışır.
+  if (url.pathname === "/api/tls/ask") return NextResponse.next();
+
   // İç yollar dışarıdan çağrılamaz.
   if (url.pathname.startsWith("/s/")) {
     return new NextResponse("Not found", { status: 404 });
@@ -50,7 +53,6 @@ export async function proxy(req: NextRequest) {
       target.pathname = `/s/${encodeURIComponent(key)}${url.pathname === "/" ? "" : url.pathname}`;
       return NextResponse.rewrite(target, { request: { headers: withPathHeader(req, key) } });
     }
-    if (url.pathname === "/") return NextResponse.redirect(new URL("/panel", req.url));
     return NextResponse.next();
   }
 

@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { clsx } from "clsx";
-import { ChevronDown, Heart, Menu, Search, ShoppingBag, User } from "lucide-react";
+import { ChevronDown, Menu, Search, ShoppingBag, User } from "lucide-react";
 import type { MenuItem } from "@/lib/store-types";
-import type { ThemeKey } from "@/themes/registry";
+import { styleOf, type StyleKey, type ThemeKey } from "@/themes/registry";
 import { useStore } from "./providers";
 import { BrandMark } from "./brand-icons";
 
 /* ---------------- Duyuru bandı ---------------- */
 
-export function AnnouncementBar({ messages, variant }: { messages: string[]; variant: ThemeKey }) {
+export function AnnouncementBar({ messages, variant: theme, marquee, className }: { messages: string[]; variant: ThemeKey; marquee?: boolean; className?: string }) {
+  const variant = styleOf(theme);
   const [i, setI] = useState(0);
   useEffect(() => {
     if (messages.length < 2) return;
@@ -20,10 +21,10 @@ export function AnnouncementBar({ messages, variant }: { messages: string[]; var
   }, [messages.length]);
   if (!messages.length) return null;
 
-  if (variant === "neon") {
+  if (marquee ?? variant === "neon") {
     const row = [...messages, ...messages];
     return (
-      <div className="overflow-hidden border-b border-line bg-primary py-2 text-black">
+      <div className={clsx("overflow-hidden border-b border-line py-2", className ?? "bg-primary text-black")}>
         <div className="animate-marquee flex w-max gap-10 whitespace-nowrap text-xs font-bold uppercase tracking-[0.2em]">
           {[...row, ...row].map((m, k) => (
             <span key={k} className="flex items-center gap-10">
@@ -35,7 +36,7 @@ export function AnnouncementBar({ messages, variant }: { messages: string[]; var
     );
   }
 
-  const styles: Record<ThemeKey, string> = {
+  const styles: Record<StyleKey, string> = {
     urban: "bg-black text-white text-[12px] tracking-wide",
     arena: "bg-accent text-accent-fg text-[13px] font-semibold",
     neon: "",
@@ -43,7 +44,7 @@ export function AnnouncementBar({ messages, variant }: { messages: string[]; var
     pulse: "bg-primary text-primary-fg text-[13px] font-semibold",
   };
   return (
-    <div className={clsx("relative h-9 overflow-hidden", styles[variant])}>
+    <div className={clsx("relative h-9 overflow-hidden", className ?? styles[variant])}>
       {messages.map((m, k) => (
         <p
           key={k}
@@ -87,8 +88,9 @@ export function StickyHeader({ children, className, transparentTop }: { children
 
 /* ---------------- Aksiyon ikonları ---------------- */
 
-export function HeaderActions({ variant, labels }: { variant: ThemeKey; labels?: boolean }) {
-  const { cartCount, favorites, setCartOpen, setSearchOpen, hydrated } = useStore();
+export function HeaderActions({ variant: theme, labels }: { variant: ThemeKey; labels?: boolean }) {
+  const variant = styleOf(theme);
+  const { cartCount, setCartOpen, setSearchOpen, hydrated } = useStore();
   const btn = clsx(
     "relative grid place-items-center",
     variant === "pulse" ? "h-10 w-10 rounded-full bg-soft hover:bg-line" : "h-10 w-10 hover:opacity-70",
@@ -118,11 +120,6 @@ export function HeaderActions({ variant, labels }: { variant: ThemeKey; labels?:
         <User size={21} strokeWidth={1.8} />
         {label("Hesabım")}
       </Link>
-      <Link href="/favorilerim" aria-label="Favorilerim" className={clsx(btn, "hidden sm:grid")}>
-        <Heart size={21} strokeWidth={1.8} />
-        {label("Favorilerim")}
-        {count(favorites.length)}
-      </Link>
       <button type="button" aria-label={`Sepetim, ${cartCount} ürün`} className={btn} onClick={() => setCartOpen(true)}>
         <ShoppingBag size={21} strokeWidth={1.8} />
         {label("Sepetim")}
@@ -141,7 +138,8 @@ export function MenuButton({ className }: { className?: string }) {
   );
 }
 
-export function SearchTrigger({ variant, className }: { variant: ThemeKey; className?: string }) {
+export function SearchTrigger({ variant: theme, className }: { variant: ThemeKey; className?: string }) {
+  const variant = styleOf(theme);
   const { setSearchOpen } = useStore();
   return (
     <button
@@ -162,7 +160,8 @@ export function SearchTrigger({ variant, className }: { variant: ThemeKey; class
 
 /* ---------------- Mega menü ---------------- */
 
-export function MegaNav({ items, variant, className }: { items: MenuItem[]; variant: ThemeKey; className?: string }) {
+export function MegaNav({ items, variant: theme, className, linkClass, activeClass }: { items: MenuItem[]; variant: ThemeKey; className?: string; linkClass?: string; activeClass?: string }) {
+  const variant = styleOf(theme);
   const [open, setOpen] = useState<number | null>(null);
   const timer = useRef<number | null>(null);
   const enter = (i: number) => {
@@ -174,7 +173,7 @@ export function MegaNav({ items, variant, className }: { items: MenuItem[]; vari
     timer.current = window.setTimeout(() => setOpen(null), 120);
   };
 
-  const linkCls: Record<ThemeKey, string> = {
+  const linkCls: Record<StyleKey, string> = {
     urban: "h-16 px-2.5 text-[13px] font-bold uppercase tracking-[0.04em] xl:px-3",
     arena: "h-12 px-4 text-[14px] font-semibold",
     neon: "h-16 px-3 text-[13px] font-semibold uppercase tracking-[0.14em]",
@@ -184,7 +183,7 @@ export function MegaNav({ items, variant, className }: { items: MenuItem[]; vari
 
   return (
     <nav className={clsx("hidden lg:block", className)} aria-label="Ana menü" onMouseLeave={leave}>
-      <ul className={clsx("flex items-center", variant === "arena" && "gap-1")}>
+      <ul className={clsx("flex items-center", theme === "arena" && "gap-1")}>
         {items.map((item, i) => {
           const hasPanel = Boolean(item.columns?.length || item.brands?.length);
           return (
@@ -194,15 +193,15 @@ export function MegaNav({ items, variant, className }: { items: MenuItem[]; vari
                 onClick={() => setOpen(null)}
                 className={clsx(
                   "relative flex items-center gap-1 whitespace-nowrap transition-colors",
-                  linkCls[variant],
+                  linkClass ?? linkCls[variant],
                   item.tone === "sale" && "text-sale",
-                  variant === "arena" && "text-primary-fg hover:bg-white/10",
-                  variant === "arena" && item.tone === "sale" && "bg-sale text-white hover:bg-sale",
-                  open === i && variant !== "arena" && "after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:bg-fg",
+                  theme === "arena" && "text-primary-fg hover:bg-white/10",
+                  theme === "arena" && item.tone === "sale" && "bg-sale text-white hover:bg-sale",
+                  open === i && theme !== "arena" && (activeClass ?? "after:absolute after:inset-x-3 after:bottom-0 after:h-[2px] after:bg-current"),
                 )}
               >
                 {item.label}
-                {hasPanel && variant === "arena" && <ChevronDown size={14} className="opacity-70" />}
+                {hasPanel && theme === "arena" && <ChevronDown size={14} className="opacity-70" />}
               </Link>
             </li>
           );
@@ -214,14 +213,15 @@ export function MegaNav({ items, variant, className }: { items: MenuItem[]; vari
           onMouseEnter={() => enter(open)}
           onMouseLeave={leave}
         >
-          <MegaPanel item={items[open]} variant={variant} onNavigate={() => setOpen(null)} />
+          <MegaPanel item={items[open]} variant={theme} onNavigate={() => setOpen(null)} />
         </div>
       ) : null}
     </nav>
   );
 }
 
-function MegaPanel({ item, variant, onNavigate }: { item: MenuItem; variant: ThemeKey; onNavigate: () => void }) {
+function MegaPanel({ item, variant: theme, onNavigate }: { item: MenuItem; variant: ThemeKey; onNavigate: () => void }) {
+  const variant = styleOf(theme);
   const brandOnly = !item.columns?.length || item.label === "Markalar";
   return (
     <div className="container-x grid grid-cols-12 gap-8 py-8">
@@ -278,5 +278,39 @@ function MegaPanel({ item, variant, onNavigate }: { item: MenuItem; variant: The
         </Link>
       )}
     </div>
+  );
+}
+
+/* ---------------- Mobil alt menü (Outlet) ---------------- */
+
+export function MobileTabBar() {
+  const { cartCount, setCartOpen, setMenuOpen, hydrated } = useStore();
+  const item = "flex flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold";
+  return (
+    <nav aria-label="Alt menü" className="fixed inset-x-0 bottom-0 z-30 flex h-16 border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      <Link href="/" className={item}>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+          <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />
+        </svg>
+        Ana Sayfa
+      </Link>
+      <button type="button" onClick={() => setMenuOpen(true)} className={item}>
+        <Menu size={22} strokeWidth={1.8} />
+        Kategoriler
+      </button>
+      <Link href="/indirim" className={clsx(item, "text-sale")}>
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-sale text-[11px] font-black text-white">%</span>
+        Fırsatlar
+      </Link>
+      <button type="button" onClick={() => setCartOpen(true)} className={clsx(item, "relative")}>
+        <ShoppingBag size={22} strokeWidth={1.8} />
+        {hydrated && cartCount > 0 && <span className="absolute right-[calc(50%-20px)] top-2 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-fg">{cartCount}</span>}
+        Sepetim
+      </button>
+      <Link href="/hesabim" className={item}>
+        <User size={22} strokeWidth={1.8} />
+        Hesabım
+      </Link>
+    </nav>
   );
 }

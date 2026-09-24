@@ -1,0 +1,26 @@
+# Panel alan adı ve satıcıların bağladığı tüm alan adları için otomatik HTTPS.
+# Yeni bir alan adı ilk kez ziyaret edildiğinde Caddy, /api/tls/ask ile alan adının platformda
+# kayıtlı olup olmadığını sorar; kayıtlıysa Let's Encrypt sertifikası alınır.
+{
+	email {$ACME_EMAIL}
+	on_demand_tls {
+		ask http://app:3000/api/tls/ask
+	}
+}
+
+{$PANEL_HOST} {
+	encode zstd gzip
+	reverse_proxy app:3000
+}
+
+https:// {
+	tls {
+		on_demand
+	}
+	encode zstd gzip
+	reverse_proxy app:3000
+}
+
+http:// {
+	redir https://{host}{uri} permanent
+}

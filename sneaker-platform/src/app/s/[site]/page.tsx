@@ -19,8 +19,9 @@ export async function generateMetadata({ params }: PageProps<"/s/[site]">): Prom
   };
 }
 
-export default async function HomePage({ params }: PageProps<"/s/[site]">) {
+export default async function HomePage({ params, searchParams }: PageProps<"/s/[site]">) {
   const { site, all } = await requireSiteWithCatalog(params);
+  const deleted = (await searchParams).hesap === "silindi";
   const h = pickHome(all);
   const posts = await cached(`posts:${site.id}:home`, 60_000, () =>
     db
@@ -44,7 +45,7 @@ export default async function HomePage({ params }: PageProps<"/s/[site]">) {
   }));
 
   const Home = HOMES[site.theme];
-  return (
+  const home = (
     <Home
       site={site}
       featured={toCards(h.featured, all)}
@@ -62,5 +63,14 @@ export default async function HomePage({ params }: PageProps<"/s/[site]">) {
       posts={posts}
       seo={homeSeoText(site, brands.map((b) => b.name))}
     />
+  );
+  if (!deleted) return home;
+  return (
+    <>
+      <p role="status" className="container-x mt-4 rounded-theme border border-line bg-soft px-4 py-3 text-sm">
+        Hesabın ve kişisel verilerin silindi. Bizi tercih ettiğin için teşekkür ederiz.
+      </p>
+      {home}
+    </>
   );
 }

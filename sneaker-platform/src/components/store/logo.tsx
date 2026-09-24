@@ -52,6 +52,43 @@ export function Logo({ site, className, size = "md" }: { site: SiteContext; clas
             </span>
           </span>
         );
+      case "volt":
+        return (
+          <span className="font-heading font-bold uppercase tracking-[0.04em]" style={{ fontSize: 30 * s }}>
+            {text}
+            <span className="text-primary">.</span>
+          </span>
+        );
+      case "metro":
+        return (
+          <span className="font-heading font-extrabold tracking-[-0.03em] text-accent" style={{ fontSize: 30 * s }}>
+            {text}
+          </span>
+        );
+      case "brut":
+        return (
+          <span className="border-2 border-fg bg-accent px-2 py-0.5 font-heading font-black uppercase tracking-[-0.04em] text-black shadow-[3px_3px_0_var(--c-fg)]" style={{ fontSize: 24 * s }}>
+            {text}
+          </span>
+        );
+      case "luxe":
+        return (
+          <span className="flex flex-col items-center leading-none">
+            <span className="font-heading font-medium uppercase tracking-[0.32em]" style={{ fontSize: 26 * s }}>
+              {text}
+            </span>
+            <span className="mt-1 text-[9px] uppercase tracking-[0.5em] text-primary">Est. {new Date().getFullYear() - 3}</span>
+          </span>
+        );
+      case "outlet":
+        return (
+          <span className="flex items-center gap-1.5">
+            <span className="rounded-lg bg-primary px-2.5 py-1 font-heading font-extrabold lowercase tracking-tight text-primary-fg" style={{ fontSize: 24 * s }}>
+              {text}
+            </span>
+            <span className="hidden rounded bg-accent px-1.5 py-0.5 text-[10px] font-extrabold uppercase text-black sm:inline">outlet</span>
+          </span>
+        );
       default:
         return (
           <span className="font-heading font-black uppercase tracking-[-0.04em]" style={{ fontSize: 28 * s }}>

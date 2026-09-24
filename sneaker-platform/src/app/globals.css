@@ -107,6 +107,97 @@
   --r-theme-lg: 28px;
 }
 
+[data-theme="volt"] {
+  --c-bg: #ffffff;
+  --c-fg: #111111;
+  --c-muted: #6f6f6f;
+  --c-line: #e6e6e6;
+  --c-soft: #f4f4f4;
+  --c-card: #ffffff;
+  --f-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-oswald), var(--font-inter), sans-serif;
+  --r-theme: 0px;
+  --r-theme-lg: 0px;
+}
+
+[data-theme="metro"] {
+  --c-bg: #ffffff;
+  --c-fg: #111111;
+  --c-muted: #6b6b6b;
+  --c-line: #e3e3e3;
+  --c-soft: #f6f6f6;
+  --c-card: #ffffff;
+  --f-body: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --r-theme: 4px;
+  --r-theme-lg: 8px;
+}
+
+[data-theme="brut"] {
+  --c-bg: #f3f0e8;
+  --c-fg: #0a0a0a;
+  --c-muted: #55524b;
+  --c-line: #0a0a0a;
+  --c-soft: #e9e4d6;
+  --c-card: #ffffff;
+  --f-body: var(--font-spacemono), ui-monospace, monospace;
+  --f-heading: var(--font-archivo), var(--font-inter), sans-serif;
+  --r-theme: 0px;
+  --r-theme-lg: 0px;
+}
+
+[data-theme="luxe"] {
+  --c-bg: #0b0b0c;
+  --c-fg: #f3efe6;
+  --c-muted: #9b9486;
+  --c-line: #2a2823;
+  --c-soft: #151513;
+  --c-card: #111110;
+  --f-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-cormorant), Georgia, serif;
+  --r-theme: 0px;
+  --r-theme-lg: 0px;
+  color-scheme: dark;
+}
+
+[data-theme="outlet"] {
+  --c-bg: #ffffff;
+  --c-fg: #1b1b1b;
+  --c-muted: #6b7280;
+  --c-line: #e8e8e8;
+  --c-soft: #f5f5f7;
+  --c-card: #ffffff;
+  --f-body: var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
+  --f-heading: var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
+  --r-theme: 8px;
+  --r-theme-lg: 14px;
+}
+
+/* Koyu yüzen panel (Volt ürün sayfası satın alma kutusu) — yalnızca geniş ekranda */
+@media (min-width: 1024px) {
+  .panel-dark-lg {
+    --c-bg: #262626;
+    --c-fg: #ffffff;
+    --c-muted: #b3b3b3;
+    --c-line: #4a4a4a;
+    --c-soft: #333333;
+    --c-card: #2d2d2d;
+    background: var(--c-bg);
+    color: var(--c-fg);
+  }
+}
+
+.panel-dark {
+  --c-bg: #262626;
+  --c-fg: #ffffff;
+  --c-muted: #b3b3b3;
+  --c-line: #4a4a4a;
+  --c-soft: #333333;
+  --c-card: #2d2d2d;
+  background: var(--c-bg);
+  color: var(--c-fg);
+}
+
 .store {
   background: var(--c-bg);
   color: var(--c-fg);
@@ -238,4 +329,60 @@
 
 input[type="range"] {
   accent-color: var(--c-primary);
+}
+
+[data-theme="volt"] .h-display {
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  font-weight: 700;
+}
+[data-theme="brut"] .h-display {
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  font-weight: 900;
+}
+[data-theme="luxe"] .h-display {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+[data-theme="outlet"] .h-display {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+[data-theme="metro"] .h-display {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Brut: kalın çerçeveli kutular */
+.brut-box {
+  border: 2px solid var(--c-fg);
+  box-shadow: 4px 4px 0 var(--c-fg);
+}
+.brut-box-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.brut-box-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--c-fg);
+}
+
+/* Yatay görsel şeridi (Volt) */
+.filmstrip {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+.filmstrip > * {
+  scroll-snap-align: start;
+}
+
+[data-theme="luxe"] .font-heading,
+[data-theme="luxe"] h1,
+[data-theme="luxe"] h2 {
+  font-variant-numeric: lining-nums;
+}
+
+/* Panel: grid öğeleri içerik genişliğiyle taşmasın (mobilde yatay kaydırmayı önler) */
+.panel-root .grid > * {
+  min-width: 0;
 }

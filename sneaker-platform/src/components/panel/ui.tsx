@@ -82,3 +82,105 @@ export function Empty({ title, description, action }: { title: string; descripti
     </div>
   );
 }
+
+/** Sekme gezinmesi (?sekme= parametresiyle). Mobilde yatay kaydırılır. */
+export function TabNav({ tabs, active, base }: { tabs: { key: string; label: string; badge?: number | string }[]; active: string; base: string }) {
+  return (
+    <div className="no-scrollbar -mx-4 mb-6 overflow-x-auto border-b border-zinc-200 px-4 md:mx-0 md:px-0">
+      <nav className="flex min-w-max gap-1">
+        {tabs.map((t) => (
+          <Link
+            key={t.key}
+            href={`${base}${base.includes("?") ? "&" : "?"}sekme=${t.key}`}
+            scroll={false}
+            className={clsx(
+              "relative flex items-center gap-1.5 whitespace-nowrap px-3 py-3 text-sm font-medium transition-colors",
+              active === t.key ? "text-zinc-900 after:absolute after:inset-x-2 after:-bottom-px after:h-0.5 after:bg-zinc-900" : "text-zinc-500 hover:text-zinc-900",
+            )}
+          >
+            {t.label}
+            {t.badge !== undefined && t.badge !== 0 && <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-bold text-zinc-600">{t.badge}</span>}
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+/** GET arama/filtre formu. */
+export function FilterBar({ children, action }: { children: React.ReactNode; action?: string }) {
+  return (
+    <form action={action} className="mb-4 flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-3 sm:flex-row sm:flex-wrap sm:items-center">
+      {children}
+      <button type="submit" className="h-10 rounded-lg bg-zinc-900 px-4 text-sm font-semibold text-white">
+        Filtrele
+      </button>
+    </form>
+  );
+}
+
+export function Pager({ page, pages, href }: { page: number; pages: number; href: (p: number) => string }) {
+  if (pages < 2) return null;
+  const list: (number | "…")[] = [];
+  for (let i = 1; i <= pages; i++) {
+    if (i === 1 || i === pages || Math.abs(i - page) <= 1) list.push(i);
+    else if (list[list.length - 1] !== "…") list.push("…");
+  }
+  return (
+    <nav className="mt-5 flex flex-wrap items-center justify-center gap-1" aria-label="Sayfalama">
+      {list.map((p, i) =>
+        p === "…" ? (
+          <span key={`e${i}`} className="px-2 text-zinc-400">
+            …
+          </span>
+        ) : (
+          <Link key={p} href={href(p)} className={clsx("grid h-9 min-w-9 place-items-center rounded-lg border px-2 text-sm font-medium", p === page ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 bg-white hover:border-zinc-400")}>
+            {p}
+          </Link>
+        ),
+      )}
+    </nav>
+  );
+}
+
+/** Masaüstünde tablo, mobilde kart görünümü için tablo kabı. */
+export function TableCard({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={clsx("overflow-hidden rounded-xl border border-zinc-200 bg-white", className)}>{children}</div>;
+}
+
+export const thCls = "px-4 py-3 text-left text-xs font-medium text-zinc-500";
+export const tdCls = "px-4 py-3 align-middle";
+
+export function KeyValue({ items }: { items: [string, React.ReactNode][] }) {
+  return (
+    <dl className="grid grid-cols-[minmax(110px,auto)_1fr] gap-x-4 gap-y-2 text-sm">
+      {items.map(([k, v]) => (
+        <div key={k} className="contents">
+          <dt className="text-zinc-500">{k}</dt>
+          <dd className="min-w-0 break-words font-medium">{v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+export function Notice({ children, tone = "zinc" }: { children: React.ReactNode; tone?: "zinc" | "amber" | "green" | "blue" | "red" }) {
+  const t = {
+    zinc: "border-zinc-200 bg-zinc-50 text-zinc-700",
+    amber: "border-amber-200 bg-amber-50 text-amber-900",
+    green: "border-emerald-200 bg-emerald-50 text-emerald-900",
+    blue: "border-sky-200 bg-sky-50 text-sky-900",
+    red: "border-rose-200 bg-rose-50 text-rose-900",
+  }[tone];
+  return <div className={clsx("rounded-xl border px-4 py-3 text-sm leading-relaxed", t)}>{children}</div>;
+}
+
+export const STATUS_BADGE: Record<string, { label: string; tone: "zinc" | "green" | "amber" | "red" | "blue" | "violet" }> = {
+  pending_payment: { label: "Ödeme bekleniyor", tone: "amber" },
+  paid: { label: "Ödeme alındı", tone: "blue" },
+  preparing: { label: "Hazırlanıyor", tone: "violet" },
+  shipped: { label: "Kargoda", tone: "violet" },
+  delivered: { label: "Teslim edildi", tone: "green" },
+  cancelled: { label: "İptal", tone: "red" },
+  refunded: { label: "İade edildi", tone: "zinc" },
+};

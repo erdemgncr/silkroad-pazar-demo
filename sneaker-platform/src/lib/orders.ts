@@ -6,7 +6,8 @@ import type { SiteContext } from "@/lib/site";
 import { getCatalog } from "@/lib/catalog";
 import { invalidate } from "@/lib/cache";
 import { formatPrice } from "@/lib/format";
-import { orderConfirmationHtml, sendMail } from "@/lib/mailer";
+import { newOrderMerchantHtml, orderConfirmationHtml, sendMail, type MailOrder } from "@/lib/mailer";
+import { notify, panelUrl } from "@/lib/notify";
 
 export type CartInput = { productId: number; size: string; quantity: number }[];
 
@@ -211,22 +212,58 @@ export async function markOrderPaid(site: SiteContext, orderNo: string, payment:
     invalidate(`catalog:${site.catalogKey}`);
     const o = result.order;
     const a = o.shippingAddress;
-    void sendMail({
-      to: o.email,
-      subject: `${site.name} - ${o.orderNo} numaralı siparişin alındı`,
-      fromName: site.name,
-      replyTo: site.settings.contact.email || undefined,
-      html: orderConfirmationHtml(site.name, site.settings.colors.primary, site.baseUrl, {
-        orderNo: o.orderNo,
-        firstName: o.firstName,
-        total: o.total,
-        subtotal: o.subtotal,
-        discount: o.discount,
-        shippingFee: o.shippingFee,
-        items: (result.items ?? []).map((i) => ({ title: i.title, size: i.size, quantity: i.quantity, unitPrice: i.unitPrice })),
-        address: `${a.line}, ${a.district} / ${a.city}`,
-      }),
-    });
+    const mailOrder: MailOrder = {
+      orderNo: o.orderNo,
+      firstName: o.firstName,
+      lastName: o.lastName,
+      email: o.email,
+      phone: o.phone,
+      total: o.total,
+      subtotal: o.subtotal,
+      discount: o.discount,
+      shippingFee: o.shippingFee,
+      items: (result.items ?? []).map((i) => ({ title: i.title, size: i.size, quantity: i.quantity, unitPrice: i.unitPrice })),
+      address: `${a.line}, ${a.district} / ${a.city}`,
+    };
+    void (async () => {
+      await sendMail({
+        to: o.email,
+        subject: `${site.name} - ${o.orderNo} numaralı siparişin alındı`,
+        fromName: site.name,
+        replyTo: site.settings.contact.email || undefined,
+        template: "order_confirmation",
+        siteId: site.id,
+        merchantId: site.merchantId,
+        html: orderConfirmationHtml(site.name, site.settings.colors.primary, site.baseUrl, mailOrder),
+      });
+      await notify({
+        merchantId: site.merchantId,
+        siteId: site.id,
+        type: "order",
+        title: `Yeni sipariş: ${o.orderNo} (${formatPrice(o.total)})`,
+        body: `${o.firstName} ${o.lastName} · ${site.name}`,
+        link: `/panel/siparisler/${o.id}`,
+        email: { subject: `[${site.name}] Yeni sipariş ${o.orderNo} - ${formatPrice(o.total)}`, html: newOrderMerchantHtml(site.name, panelUrl(`/panel/siparisler/${o.id}`), mailOrder), template: "merchant_new_order" },
+      });
+      // Azalan stok uyarısı
+      const ids = [...new Set((result.items ?? []).map((i) => i.productId).filter(Boolean) as number[])];
+      for (const id of ids) {
+        const p = await db.query.products.findFirst({ where: eq(schema.products.id, id) });
+        const low = p?.variants.filter((v) => v.stock <= 1) ?? [];
+        const sold = (result.items ?? []).filter((i) => i.productId === id).map((i) => i.size);
+        const relevant = low.filter((v) => sold.includes(v.size));
+        if (p && relevant.length) {
+          await notify({
+            merchantId: site.merchantId,
+            siteId: site.id,
+            type: "stock",
+            title: `Stok azaldı: ${p.title} ${p.colorName}`,
+            body: relevant.map((v) => `${v.size} numara: ${v.stock} adet`).join(", "),
+            link: `/panel/urunler/${p.id}`,
+          });
+        }
+      }
+    })().catch((e) => console.error("[order] bildirim", e));
     // Satış sonrası stoklar Shopier'e aktarılır (bağlıysa).
     void import("@/lib/shopier/sync").then((m) => m.pushStockForOrder(site, o.id)).catch((e) => console.error("[shopier] stok aktarımı", e));
   }

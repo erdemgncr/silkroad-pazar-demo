@@ -62,6 +62,17 @@ export async function sendContactMessage(_: ActionState, form: FormData): Promis
     orderNo: d.orderNo || null,
     message: d.message,
   });
+  const { notify, panelUrl } = await import("@/lib/notify");
+  const { contactMessageHtml } = await import("@/lib/mailer");
+  void notify({
+    merchantId: site.merchantId,
+    siteId: site.id,
+    type: "message",
+    title: `Yeni mesaj: ${d.subject}`,
+    body: `${d.name} · ${site.name}`,
+    link: "/panel/mesajlar",
+    email: { subject: `[${site.name}] Yeni iletişim mesajı: ${d.subject}`, html: contactMessageHtml(site.name, panelUrl("/panel/mesajlar"), { ...d, phone: d.phone || null, orderNo: d.orderNo || null }), template: "merchant_contact" },
+  }).catch((e) => console.error("[notify]", e));
   return { ok: true, message: "Mesajın bize ulaştı. Müşteri hizmetlerimiz en geç 1 iş günü içinde dönüş yapacak." };
 }
 

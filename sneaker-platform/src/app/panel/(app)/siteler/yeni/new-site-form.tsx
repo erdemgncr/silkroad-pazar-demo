@@ -22,7 +22,7 @@ function toSlug(s: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-export function NewSiteForm({ themes }: { themes: ThemeMeta[] }) {
+export function NewSiteForm({ themes, merchants, currentMerchantId, rootDomain }: { themes: ThemeMeta[]; merchants?: { id: number; name: string }[]; currentMerchantId?: number; rootDomain: string }) {
   const [state, action, pending] = useActionState<FormState, FormData>(createSiteAction, null);
   const [theme, setTheme] = useState(themes[0].key);
   const [name, setName] = useState("");
@@ -33,7 +33,7 @@ export function NewSiteForm({ themes }: { themes: ThemeMeta[] }) {
       <section className="rounded-xl border border-zinc-200 bg-white p-5">
         <h2 className="font-semibold">1. Tema seç</h2>
         <p className="mt-1 text-sm text-zinc-500">Temayı daha sonra tek tıkla değiştirebilirsin.</p>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
           {themes.map((t) => (
             <label key={t.key} className={clsx("cursor-pointer overflow-hidden rounded-xl border-2 bg-white transition-all", theme === t.key ? "border-zinc-900 shadow-lg" : "border-zinc-200 hover:border-zinc-400")}>
               <input type="radio" name="theme" value={t.key} checked={theme === t.key} onChange={() => setTheme(t.key)} className="sr-only" />
@@ -51,6 +51,19 @@ export function NewSiteForm({ themes }: { themes: ThemeMeta[] }) {
       <section className="rounded-xl border border-zinc-200 bg-white p-5">
         <h2 className="font-semibold">2. Site bilgileri</h2>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {merchants && merchants.length > 0 && (
+            <label className="md:col-span-2">
+              <span className={labelCls}>Satıcı</span>
+              <select name="merchantId" defaultValue={currentMerchantId} className={inputCls}>
+                {merchants.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-xs text-zinc-500">Site bu satıcının hesabında, onun kataloğuyla oluşturulur.</span>
+            </label>
+          )}
           <label>
             <span className={labelCls}>Site adı (marka)</span>
             <input
@@ -77,7 +90,7 @@ export function NewSiteForm({ themes }: { themes: ThemeMeta[] }) {
                 }}
                 className="h-10 min-w-0 flex-1 rounded-l-lg px-3 text-sm outline-none"
               />
-              <span className="px-3 text-sm text-zinc-500">.platform alan adı</span>
+              <span className="max-w-[45%] truncate px-3 text-sm text-zinc-500">.{rootDomain}</span>
             </div>
           </label>
           <label>

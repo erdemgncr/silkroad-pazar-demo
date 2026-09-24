@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { ArrowRight, ChevronDown, Minus, Plus, Search, ShoppingBag, Trash2, Truck, X } from "lucide-react";
 import type { CardProduct, MenuItem } from "@/lib/store-types";
-import type { ThemeKey } from "@/themes/registry";
+import { styleOf, type StyleKey, type ThemeKey } from "@/themes/registry";
 import { formatPrice } from "@/lib/format";
 import { useStore } from "./providers";
 import { SOCIAL_ICONS, SvgIcon } from "./brand-icons";
@@ -57,7 +57,8 @@ export function FreeShippingBar({ subtotal }: { subtotal: number }) {
   );
 }
 
-export function CartDrawer({ variant }: { variant: ThemeKey }) {
+export function CartDrawer({ variant: theme }: { variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const { cart, cartOpen, setCartOpen, cartSubtotal, cartCount, setQuantity, removeFromCart } = useStore();
   const close = () => setCartOpen(false);
   useEsc(close, cartOpen);
@@ -159,11 +160,13 @@ export function CartDrawer({ variant }: { variant: ThemeKey }) {
 
 type SearchResponse = { products: CardProduct[]; brands: { name: string; slug: string }[]; collections: { label: string; href: string }[] };
 
-export function SearchOverlay({ popular, variant }: { popular: { label: string; href: string }[]; variant: ThemeKey }) {
+export function SearchOverlay({ popular, variant: theme }: { popular: { label: string; href: string }[]; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const { searchOpen, setSearchOpen } = useStore();
   const router = useRouter();
   const [q, setQ] = useState("");
-  const [res, setRes] = useState<SearchResponse | null>(null);
+  const [resRaw, setRes] = useState<SearchResponse | null>(null);
+  const res = q.trim().length >= 2 ? resRaw : null;
   const [loading, setLoading] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const close = () => setSearchOpen(false);
@@ -174,10 +177,7 @@ export function SearchOverlay({ popular, variant }: { popular: { label: string; 
   }, [searchOpen]);
 
   useEffect(() => {
-    if (q.trim().length < 2) {
-      setRes(null);
-      return;
-    }
+    if (q.trim().length < 2) return;
     const ctrl = new AbortController();
     const t = window.setTimeout(async () => {
       setLoading(true);
@@ -370,7 +370,6 @@ export function MobileMenu({ items, social, siteName }: { items: MenuItem[]; soc
           <ul className="space-y-1 px-2 py-4 text-sm">
             {[
               ["Hesabım", "/hesabim"],
-              ["Favorilerim", "/favorilerim"],
               ["Sipariş Takibi", "/siparis-takip"],
               ["Markalar", "/markalar"],
               ["Blog", "/blog"],

@@ -10,12 +10,14 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
+    "db:migrate": "node scripts/migrate.mjs",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx --env-file=.env scripts/seed.ts",
-    "setup": "npm run db:migrate && npm run db:seed"
+    "db:seed": "tsx scripts/seed.ts",
+    "setup": "node scripts/setup.mjs",
+    "demo": "node scripts/setup.mjs && next dev"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.3",
@@ -44,5 +46,8 @@
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=20.9"
   }
 }

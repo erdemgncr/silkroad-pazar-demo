@@ -1,3 +1,4 @@
+import { randomInt } from "crypto";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
@@ -18,7 +19,7 @@ export default async function DemoPaymentPage({ params }: PageProps<"/s/[site]/o
   const order = await db.query.orders.findFirst({ where: and(eq(schema.orders.orderNo, orderNo), eq(schema.orders.siteId, site.id)) });
   if (!order) notFound();
   if (order.status !== "pending_payment") redirect(`/odeme/sonuc/${orderNo}`);
-  const randomNr = String(Math.floor(100000 + Math.random() * 900000));
+  const randomNr = randomInt(100000, 999999).toString();
   const signature = signCallbackForTest(demoSecret(), orderNo, randomNr);
   const hidden = (status: string) => (
     <>

@@ -13,7 +13,7 @@ import { Footer } from "@/components/store/footer";
 import { JsonLd } from "@/components/store/json-ld";
 import { Analytics } from "@/components/store/analytics";
 import { organizationLd, websiteLd } from "@/lib/seo/schema-org";
-import { ArenaHeader, NeonHeader, PulseHeader, StudioHeader, UrbanHeader } from "@/themes/headers";
+import { HEADERS } from "@/themes/headers";
 import { THEMES } from "@/themes/registry";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +36,7 @@ export async function generateMetadata({ params }: LayoutProps<"/s/[site]">): Pr
     description: s.seo.homeDescription,
     keywords: s.seo.keywords.length ? s.seo.keywords : undefined,
     applicationName: site.name,
+    icons: { icon: [{ url: "/site-icon", type: "image/png", sizes: "64x64" }] },
     robots: indexable(site)
       ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } }
       : { index: false, follow: false },
@@ -106,10 +107,10 @@ export default async function SiteLayout({ children, params }: LayoutProps<"/s/[
     ...new Map(all.filter((p) => p.isBestSeller).map((p) => [p.seriesSlug, { label: `${p.brand} ${p.model}`, href: `/seri/${p.seriesSlug}` }])).values(),
   ].slice(0, 8);
   const s = site.settings;
-  const Header = { urban: UrbanHeader, arena: ArenaHeader, neon: NeonHeader, studio: StudioHeader, pulse: PulseHeader }[site.theme];
+  const Header = HEADERS[site.theme];
 
   return (
-    <div data-theme={site.theme} style={themeStyle(site)} className="store flex min-h-screen flex-col">
+    <div data-theme={site.theme} style={themeStyle(site)} className={site.theme === "outlet" ? "store flex min-h-screen flex-col pb-16 md:pb-0" : "store flex min-h-screen flex-col"}>
       <StoreProvider
         config={{
           siteId: site.id,
@@ -123,10 +124,21 @@ export default async function SiteLayout({ children, params }: LayoutProps<"/s/[
       >
         {site.isPreview && (
           <div className="flex items-center justify-center gap-3 bg-amber-400 px-4 py-1.5 text-center text-xs font-semibold text-black">
-            Önizleme modu: {site.name} ({site.status === "active" ? "yayında" : site.status === "draft" ? "taslak" : "bakımda"})
-            <a href={`/panel/onizle-kapat?geri=/panel/siteler/${site.id}`} className="underline">
-              Önizlemeden çık ve panele dön
-            </a>
+            {site.themePreview ? (
+              <>
+                Tema önizleme: {site.name} · {THEMES[site.theme].name} teması (henüz uygulanmadı)
+                <a href="/panel/onizle-kapat?geri=/panel/temalar" className="underline">
+                  Temalara dön
+                </a>
+              </>
+            ) : (
+              <>
+                Önizleme modu: {site.name} ({site.status === "active" ? "yayında" : site.status === "draft" ? "taslak" : "bakımda"})
+                <a href={`/panel/onizle-kapat?geri=/panel/siteler/${site.id}`} className="underline">
+                  Önizlemeden çık ve panele dön
+                </a>
+              </>
+            )}
           </div>
         )}
         <a href="#icerik" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[70] focus:bg-bg focus:p-3">

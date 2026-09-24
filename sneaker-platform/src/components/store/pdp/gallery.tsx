@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { clsx } from "clsx";
-import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand, X, ZoomIn } from "lucide-react";
 import type { ThemeKey } from "@/themes/registry";
 
 type Img = { url: string; alt?: string };
@@ -54,6 +54,7 @@ function Lightbox({ images, index, onClose, setIndex }: { images: Img[]; index: 
 }
 
 export function Gallery({ images, variant, badge }: { images: Img[]; variant: ThemeKey; badge?: React.ReactNode }) {
+  const stripRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [zoom, setZoom] = useState<number | null>(null);
   const track = useRef<HTMLDivElement>(null);
@@ -66,7 +67,7 @@ export function Gallery({ images, variant, badge }: { images: Img[]; variant: Th
     return () => el.removeEventListener("scroll", on);
   }, []);
 
-  const rounded = variant === "pulse" ? "rounded-theme-lg" : variant === "arena" ? "rounded-theme-lg" : "";
+  const rounded = variant === "pulse" || variant === "arena" || variant === "outlet" ? "rounded-theme-lg" : "";
 
   // Mobil: her temada yatay kaydırmalı galeri
   const mobile = (
@@ -89,11 +90,39 @@ export function Gallery({ images, variant, badge }: { images: Img[]; variant: Th
   );
 
   let desktop: React.ReactNode;
-  if (variant === "urban") {
+  if (variant === "volt") {
+    // Kenardan kenara yatay görsel şeridi (satın alma kutusu üzerinde yüzer)
+    const scroll = (d: number) => stripRef.current?.scrollBy({ left: d * stripRef.current.clientWidth * 0.6, behavior: "smooth" });
     desktop = (
-      <div className="relative hidden grid-cols-2 gap-2 md:grid">
+      <div className="relative hidden md:block">
+        <div ref={stripRef} className="filmstrip no-scrollbar flex h-[calc(100vh-150px)] max-h-[860px] min-h-[520px] overflow-x-auto">
+          {images.map((im, i) => (
+            <button key={im.url} type="button" onClick={() => setZoom(i)} className="aspect-square h-full shrink-0 bg-soft">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={im.url} alt={im.alt ?? ""} className="h-full w-full object-cover" loading={i < 2 ? "eager" : "lazy"} />
+            </button>
+          ))}
+        </div>
+        {badge && <div className="absolute left-4 top-4">{badge}</div>}
+        <button type="button" onClick={() => setZoom(0)} aria-label="Büyüt" className="absolute bottom-5 left-5 grid h-11 w-11 place-items-center bg-neutral-400/80 text-white backdrop-blur">
+          <ZoomIn size={22} />
+        </button>
+        <div className="absolute bottom-5 left-20 flex gap-1">
+          <button type="button" onClick={() => scroll(-1)} aria-label="Önceki görseller" className="grid h-11 w-11 place-items-center bg-white/85 text-black shadow">
+            <ChevronLeft size={20} />
+          </button>
+          <button type="button" onClick={() => scroll(1)} aria-label="Sonraki görseller" className="grid h-11 w-11 place-items-center bg-white/85 text-black shadow">
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      </div>
+    );
+  } else if (variant === "urban" || variant === "brut") {
+    const brut = variant === "brut";
+    desktop = (
+      <div className={clsx("relative hidden grid-cols-2 md:grid", brut ? "gap-4" : "gap-2")}>
         {images.map((im, i) => (
-          <button key={im.url} type="button" onClick={() => setZoom(i)} className={clsx("group relative aspect-square overflow-hidden bg-soft", i === 0 && images.length % 2 === 1 && "col-span-2 aspect-[2/1.1]")}>
+          <button key={im.url} type="button" onClick={() => setZoom(i)} className={clsx("group relative aspect-square overflow-hidden bg-soft", brut && "brut-box", i === 0 && images.length % 2 === 1 && "col-span-2 aspect-[2/1.1]")}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={im.url} alt={im.alt ?? ""} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" loading={i < 2 ? "eager" : "lazy"} />
           </button>
@@ -114,20 +143,36 @@ export function Gallery({ images, variant, badge }: { images: Img[]; variant: Th
       </div>
     );
   } else {
-    const thumbsLeft = variant === "arena";
-    desktop = (
-      <div className={clsx("hidden gap-3 md:flex", thumbsLeft ? "flex-row" : "flex-col")}>
-        {thumbsLeft && (
-          <div className="flex w-20 shrink-0 flex-col gap-2">
-            {images.map((im, i) => (
-              <button key={im.url} type="button" onClick={() => setActive(i)} className={clsx("aspect-square overflow-hidden rounded-theme border-2 bg-soft", i === active ? "border-primary" : "border-transparent")}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={im.url} alt="" className="h-full w-full object-cover" />
-              </button>
-            ))}
-          </div>
+    const side = variant === "arena" || variant === "metro" ? "left" : variant === "luxe" ? "right" : null;
+    const metro = variant === "metro";
+    const sideThumbs = side && (
+      <div className={clsx("flex shrink-0 flex-col gap-2", metro ? "w-[92px] gap-3" : "w-20", side === "right" && "order-last")}>
+        {images.map((im, i) => (
+          <button
+            key={im.url}
+            type="button"
+            onClick={() => setActive(i)}
+            className={clsx(
+              "aspect-square overflow-hidden bg-soft",
+              metro ? "border" : variant === "luxe" ? "border transition-opacity" : "rounded-theme border-2",
+              i === active ? (metro ? "border-fg" : variant === "luxe" ? "border-primary" : "border-primary") : metro ? "border-transparent" : variant === "luxe" ? "border-transparent opacity-50 hover:opacity-100" : "border-transparent",
+            )}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={im.url} alt="" className="h-full w-full object-cover" />
+          </button>
+        ))}
+        {variant === "luxe" && (
+          <p className="mt-2 text-center text-[11px] tracking-[0.3em] text-muted">
+            {String(active + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
+          </p>
         )}
-        <div className={clsx("group relative flex-1 overflow-hidden bg-soft", rounded, variant === "neon" ? "aspect-[4/5] ring-1 ring-line" : "aspect-square")}>
+      </div>
+    );
+    desktop = (
+      <div className={clsx("hidden gap-3 md:flex", side ? "flex-row" : "flex-col", metro && "gap-5")}>
+        {side === "left" && sideThumbs}
+        <div className={clsx("group relative flex-1 overflow-hidden bg-soft", rounded, variant === "neon" ? "aspect-[4/5] ring-1 ring-line" : variant === "luxe" ? "aspect-[4/5]" : "aspect-square")}>
           {images.map((im, i) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -149,14 +194,15 @@ export function Gallery({ images, variant, badge }: { images: Img[]; variant: Th
             <ChevronRight size={20} />
           </button>
         </div>
-        {!thumbsLeft && (
+        {side === "right" && sideThumbs}
+        {!side && (
           <div className="grid grid-cols-5 gap-2">
             {images.map((im, i) => (
               <button
                 key={im.url}
                 type="button"
                 onClick={() => setActive(i)}
-                className={clsx("aspect-square overflow-hidden border-2 bg-soft", variant === "pulse" ? "rounded-2xl" : "", i === active ? (variant === "neon" ? "border-primary" : "border-fg") : "border-transparent opacity-70 hover:opacity-100")}
+                className={clsx("aspect-square overflow-hidden border-2 bg-soft", variant === "pulse" ? "rounded-2xl" : variant === "outlet" ? "rounded-theme" : "", i === active ? (variant === "neon" ? "border-primary" : "border-fg") : "border-transparent opacity-70 hover:opacity-100")}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={im.url} alt="" className="h-full w-full object-cover" />

@@ -14,10 +14,6 @@ type StoreState = {
   setQuantity: (key: string, qty: number) => void;
   removeFromCart: (key: string) => void;
   clearCart: () => void;
-  favorites: number[];
-  favoriteItems: Record<number, CardProduct>;
-  toggleFavorite: (p: CardProduct) => void;
-  isFavorite: (id: number) => boolean;
   recent: CardProduct[];
   pushRecent: (p: CardProduct) => void;
   cartOpen: boolean;
@@ -52,7 +48,6 @@ function write(key: string, value: unknown) {
 export function StoreProvider({ config, children }: { config: StoreClientConfig; children: React.ReactNode }) {
   const k = (name: string) => `sp:${config.siteId}:${name}`;
   const [cart, setCart] = useState<CartLine[]>([]);
-  const [favoriteItems, setFavoriteItems] = useState<Record<number, CardProduct>>({});
   const [recent, setRecent] = useState<CardProduct[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -64,7 +59,6 @@ export function StoreProvider({ config, children }: { config: StoreClientConfig;
     // localStorage yalnızca istemcide okunabilir; ilk render sunucu çıktısıyla aynı kalsın diye burada yüklenir.
     /* eslint-disable react-hooks/set-state-in-effect */
     setCart(read(k("cart"), []));
-    setFavoriteItems(read(k("fav"), {}));
     setRecent(read(k("recent"), []));
     setHydrated(true);
     /* eslint-enable react-hooks/set-state-in-effect */
@@ -75,10 +69,6 @@ export function StoreProvider({ config, children }: { config: StoreClientConfig;
     if (hydrated) write(k("cart"), cart);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart, hydrated]);
-  useEffect(() => {
-    if (hydrated) write(k("fav"), favoriteItems);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [favoriteItems, hydrated]);
   useEffect(() => {
     if (hydrated) write(k("recent"), recent);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -113,22 +103,6 @@ export function StoreProvider({ config, children }: { config: StoreClientConfig;
   const removeFromCart = useCallback((key: string) => setCart((cur) => cur.filter((l) => l.key !== key)), []);
   const clearCart = useCallback(() => setCart([]), []);
 
-  const toggleFavorite = useCallback(
-    (p: CardProduct) => {
-      setFavoriteItems((cur) => {
-        const next = { ...cur };
-        if (next[p.id]) {
-          delete next[p.id];
-        } else {
-          next[p.id] = p;
-          showToast({ title: "Favorilere eklendi", body: `${p.brand} ${p.model}`, image: p.image });
-        }
-        return next;
-      });
-    },
-    [showToast],
-  );
-
   const pushRecent = useCallback((p: CardProduct) => {
     setRecent((cur) => [p, ...cur.filter((x) => x.id !== p.id)].slice(0, 12));
   }, []);
@@ -143,10 +117,6 @@ export function StoreProvider({ config, children }: { config: StoreClientConfig;
       setQuantity,
       removeFromCart,
       clearCart,
-      favorites: Object.keys(favoriteItems).map(Number),
-      favoriteItems,
-      toggleFavorite,
-      isFavorite: (id: number) => Boolean(favoriteItems[id]),
       recent,
       pushRecent,
       cartOpen,
@@ -159,7 +129,7 @@ export function StoreProvider({ config, children }: { config: StoreClientConfig;
       showToast,
       hydrated,
     }),
-    [config, cart, addToCart, setQuantity, removeFromCart, clearCart, favoriteItems, toggleFavorite, recent, pushRecent, cartOpen, searchOpen, menuOpen, toast, showToast, hydrated],
+    [config, cart, addToCart, setQuantity, removeFromCart, clearCart, recent, pushRecent, cartOpen, searchOpen, menuOpen, toast, showToast, hydrated],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

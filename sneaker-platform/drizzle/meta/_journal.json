@@ -8,6 +8,27 @@
       "when": 1790223358988,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790224926290,
+      "tag": "0001_notifications_mail",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790227188391,
+      "tag": "0002_merchant_ai_period",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790259822472,
+      "tag": "0003_subscriptions",
+      "breakpoints": true
     }
   ]
 }

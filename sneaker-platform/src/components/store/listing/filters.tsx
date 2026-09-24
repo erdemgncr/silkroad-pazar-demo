@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { clsx } from "clsx";
 import { Check, ChevronDown, SlidersHorizontal, X } from "lucide-react";
-import type { ThemeKey } from "@/themes/registry";
+import { styleOf, type StyleKey, type ThemeKey } from "@/themes/registry";
 import type { Facets } from "@/lib/catalog";
 import { formatPriceShort } from "@/lib/format";
 
@@ -56,7 +56,8 @@ function useQueryState() {
 
 /* ---------------- Filtre grupları ---------------- */
 
-function OptionList({ dim, facets, variant }: { dim: Dim; facets: Facets; variant: ThemeKey }) {
+function OptionList({ dim, facets, variant: theme }: { dim: Dim; facets: Facets; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const { get, toggle } = useQueryState();
   const selected = get(dim);
   const [q, setQ] = useState("");
@@ -138,7 +139,8 @@ function OptionList({ dim, facets, variant }: { dim: Dim; facets: Facets; varian
   );
 }
 
-function PriceFilter({ facets, variant }: { facets: Facets; variant: ThemeKey }) {
+function PriceFilter({ facets, variant: theme }: { facets: Facets; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const { sp, set } = useQueryState();
   const cur = (sp.get("fiyat") ?? "").split("-");
   const [min, setMin] = useState(cur[0] ?? "");
@@ -229,7 +231,8 @@ function Group({ title, children, defaultOpen = true, count }: { title: string; 
   );
 }
 
-function AllGroups({ facets, variant, hideGender }: { facets: Facets; variant: ThemeKey; hideGender?: boolean }) {
+function AllGroups({ facets, variant: theme, hideGender }: { facets: Facets; variant: ThemeKey; hideGender?: boolean }) {
+  const variant = styleOf(theme);
   const { get } = useQueryState();
   const dims: Dim[] = ["kategori", "cinsiyet", "marka", "beden", "renk"];
   return (
@@ -242,11 +245,11 @@ function AllGroups({ facets, variant, hideGender }: { facets: Facets; variant: T
         .filter((d) => !(hideGender && d === "cinsiyet"))
         .map((d) => (
           <Group key={d} title={LABELS[d]} count={get(d).length} defaultOpen={d !== "renk" || variant !== "urban"}>
-            <OptionList dim={d} facets={facets} variant={variant} />
+            <OptionList dim={d} facets={facets} variant={theme} />
           </Group>
         ))}
       <Group title="Fiyat" count={get("fiyat" as Dim).length ? 1 : 0}>
-        <PriceFilter facets={facets} variant={variant} />
+        <PriceFilter facets={facets} variant={theme} />
       </Group>
     </div>
   );
@@ -254,17 +257,19 @@ function AllGroups({ facets, variant, hideGender }: { facets: Facets; variant: T
 
 /* ---------------- Yerleşimler ---------------- */
 
-export function FilterSidebar({ facets, variant, hideGender }: { facets: Facets; variant: ThemeKey; hideGender?: boolean }) {
+export function FilterSidebar({ facets, variant: theme, hideGender }: { facets: Facets; variant: ThemeKey; hideGender?: boolean }) {
+  const variant = styleOf(theme);
   return (
     <aside className="hidden lg:block" aria-label="Filtreler">
       <div className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto pb-10 pr-2">
-        <AllGroups facets={facets} variant={variant} hideGender={hideGender} />
+        <AllGroups facets={facets} variant={theme} hideGender={hideGender} />
       </div>
     </aside>
   );
 }
 
-export function FilterDrawerButton({ facets, variant, total, hideGender, alwaysVisible }: { facets: Facets; variant: ThemeKey; total: number; hideGender?: boolean; alwaysVisible?: boolean }) {
+export function FilterDrawerButton({ facets, variant: theme, total, hideGender, alwaysVisible }: { facets: Facets; variant: ThemeKey; total: number; hideGender?: boolean; alwaysVisible?: boolean }) {
+  const variant = styleOf(theme);
   const [open, setOpen] = useState(false);
   const { clear, pending, sp } = useQueryState();
   const active = ["marka", "beden", "renk", "cinsiyet", "kategori", "fiyat", "indirim", "stok"].filter((k) => sp.get(k)).length;
@@ -298,7 +303,7 @@ export function FilterDrawerButton({ facets, variant, total, hideGender, alwaysV
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-5">
-          <AllGroups facets={facets} variant={variant} hideGender={hideGender} />
+          <AllGroups facets={facets} variant={theme} hideGender={hideGender} />
         </div>
         <div className="grid grid-cols-2 gap-2 border-t border-line p-4">
           <button type="button" onClick={clear} className={clsx("h-12 border border-line text-sm font-semibold", rounded)}>
@@ -314,7 +319,8 @@ export function FilterDrawerButton({ facets, variant, total, hideGender, alwaysV
 }
 
 /** Arena: yatay açılır filtre çubuğu. */
-export function FilterBar({ facets, variant, hideGender }: { facets: Facets; variant: ThemeKey; hideGender?: boolean }) {
+export function FilterBar({ facets, variant: theme, hideGender }: { facets: Facets; variant: ThemeKey; hideGender?: boolean }) {
+  const variant = styleOf(theme);
   const [open, setOpen] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const { get, sp, set } = useQueryState();
@@ -342,7 +348,7 @@ export function FilterBar({ facets, variant, hideGender }: { facets: Facets; var
             </button>
             {open === d && (
               <div className="animate-in absolute left-0 top-12 z-30 w-80 rounded-theme-lg border border-line bg-bg p-4 shadow-xl">
-                {d === "fiyat" ? <PriceFilter facets={facets} variant={variant} /> : <OptionList dim={d} facets={facets} variant={variant} />}
+                {d === "fiyat" ? <PriceFilter facets={facets} variant={theme} /> : <OptionList dim={d} facets={facets} variant={theme} />}
               </div>
             )}
           </div>
@@ -359,7 +365,8 @@ export function FilterBar({ facets, variant, hideGender }: { facets: Facets; var
   );
 }
 
-export function SortSelect({ variant }: { variant: ThemeKey }) {
+export function SortSelect({ variant: theme }: { variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const { sp, set } = useQueryState();
   const cur = sp.get("siralama") ?? "onerilen";
   return (

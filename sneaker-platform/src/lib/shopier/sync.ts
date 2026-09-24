@@ -22,6 +22,10 @@ export function clientFor(account: ShopierAccount) {
 
 async function log(account: Pick<ShopierAccount, "id" | "merchantId">, kind: string, status: "ok" | "error" | "info", message: string) {
   await db.insert(schema.syncLogs).values({ merchantId: account.merchantId, shopierAccountId: account.id, kind, status, message: message.slice(0, 1000) });
+  if (status === "error" && kind !== "push") {
+    const { notify } = await import("@/lib/notify");
+    await notify({ merchantId: account.merchantId, type: "sync", title: `Shopier ${kind} hatası`, body: message.slice(0, 300), link: "/panel/shopier" }).catch(() => undefined);
+  }
 }
 
 function errText(e: unknown) {
@@ -206,6 +210,10 @@ export async function pushProducts(accountId: number, productIds: number[]) {
   if (account) {
     await db.update(schema.shopierAccounts).set({ lastSyncAt: new Date(), lastSyncStatus: `${ok} ürün aktarıldı, ${failed} hata` }).where(eq(schema.shopierAccounts.id, accountId));
     await log(account, "push", failed ? "error" : "ok", `${ok} ürün Shopier'e aktarıldı, ${failed} hata`);
+    if (failed) {
+      const { notify } = await import("@/lib/notify");
+      await notify({ merchantId: account.merchantId, type: "sync", title: "Shopier ürün aktarımında hata", body: `${failed} ürün aktarılamadı. Ayrıntılar Shopier sayfasındaki kayıtlarda.`, link: "/panel/shopier" });
+    }
   }
   return { ok, failed };
 }

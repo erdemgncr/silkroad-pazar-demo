@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { clsx } from "clsx";
 import { ArrowRight, BadgePercent, CreditCard, RotateCcw, ShieldCheck, Truck } from "lucide-react";
-import type { ThemeKey } from "@/themes/registry";
+import { styleOf, type StyleKey, type ThemeKey } from "@/themes/registry";
 import type { SiteContext } from "@/lib/site";
 import type { CardProduct } from "@/lib/store-types";
 import type { PromoBanner } from "@/lib/site-settings";
@@ -16,7 +16,7 @@ export function SectionHeading({
   subtitle,
   href,
   linkLabel = "Tümünü Gör",
-  variant,
+  variant: theme,
   center,
   withArrows,
 }: {
@@ -28,18 +28,26 @@ export function SectionHeading({
   center?: boolean;
   withArrows?: boolean;
 }) {
-  const titleCls: Record<ThemeKey, string> = {
+  const variant = styleOf(theme);
+  const titleCls: Record<StyleKey, string> = {
     urban: "font-heading text-2xl font-black uppercase tracking-tight md:text-[34px]",
     arena: "font-heading text-2xl font-bold md:text-3xl",
     neon: "font-heading text-4xl uppercase md:text-6xl",
     studio: "font-heading text-3xl md:text-5xl",
     pulse: "font-heading text-2xl font-extrabold md:text-[32px]",
   };
+  const themeTitle: Partial<Record<ThemeKey, string>> = {
+    volt: "font-heading text-3xl font-bold uppercase md:text-[44px]",
+    metro: "font-heading text-2xl font-bold md:text-[30px]",
+    brut: "font-heading text-3xl font-black uppercase md:text-5xl",
+    luxe: "font-heading text-4xl md:text-5xl",
+    outlet: "font-heading text-xl font-extrabold md:text-[26px]",
+  };
   return (
-    <div className={clsx("mb-6 flex items-end justify-between gap-4 md:mb-8", center && "flex-col items-center text-center")}>
+    <div className={clsx("mb-6 flex gap-4 md:mb-8", center ? "flex-col items-center text-center" : "items-end justify-between")}>
       <div className={clsx(center && "flex flex-col items-center")}>
         {variant === "neon" && subtitle && <p className="mb-2 text-xs font-bold uppercase tracking-[0.3em] text-primary">{subtitle}</p>}
-        <h2 className={clsx("h-display leading-none", titleCls[variant])}>{title}</h2>
+        <h2 className={clsx("h-display leading-none", themeTitle[theme] ?? titleCls[variant])}>{title}</h2>
         {variant !== "neon" && subtitle && <p className="mt-2 text-sm text-muted md:text-base">{subtitle}</p>}
       </div>
       {href && (
@@ -47,7 +55,9 @@ export function SectionHeading({
           href={href}
           className={clsx(
             "flex shrink-0 items-center gap-1.5 text-sm font-semibold",
-            variant === "urban" && "underline underline-offset-4",
+            variant === "urban" && theme !== "brut" && "underline underline-offset-4",
+            theme === "brut" && "border-2 border-fg bg-accent px-3 py-1.5 text-black shadow-[3px_3px_0_var(--c-fg)]",
+            theme === "outlet" && "rounded-full border border-line px-4 py-1.5",
             variant === "arena" && "text-primary",
             variant === "neon" && "uppercase tracking-widest text-primary",
             variant === "studio" && "border-b border-fg pb-0.5 text-xs uppercase tracking-[0.2em]",
@@ -68,7 +78,7 @@ export function ProductRail({
   subtitle,
   href,
   items,
-  variant,
+  variant: theme,
 }: {
   title: string;
   subtitle?: string;
@@ -76,13 +86,14 @@ export function ProductRail({
   items: CardProduct[];
   variant: ThemeKey;
 }) {
+  const variant = styleOf(theme);
   if (!items.length) return null;
   return (
     <section className="container-x py-10 md:py-14">
-      <SectionHeading title={title} subtitle={subtitle} href={href} variant={variant} withArrows />
-      <Carousel variant={variant} itemClass={variant === "neon" || variant === "studio" ? "w-[62%] sm:w-[40%] lg:w-[24%]" : undefined}>
+      <SectionHeading title={title} subtitle={subtitle} href={href} variant={theme} withArrows />
+      <Carousel variant={theme} itemClass={variant === "neon" || variant === "studio" ? "w-[62%] sm:w-[40%] lg:w-[24%]" : undefined}>
         {items.map((p) => (
-          <ProductCard key={p.id} p={p} variant={variant} />
+          <ProductCard key={p.id} p={p} variant={theme} />
         ))}
       </Carousel>
     </section>
@@ -91,7 +102,8 @@ export function ProductRail({
 
 /* ---------------- Kategori kutuları ---------------- */
 
-export function GenderTiles({ tiles, variant }: { tiles: { label: string; href: string; image: string; sub: string }[]; variant: ThemeKey }) {
+export function GenderTiles({ tiles, variant: theme }: { tiles: { label: string; href: string; image: string; sub: string }[]; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   return (
     <section className="container-x py-10 md:py-14">
       <div className={clsx("grid gap-3 md:gap-4", tiles.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2")}>
@@ -114,7 +126,8 @@ export function GenderTiles({ tiles, variant }: { tiles: { label: string; href: 
   );
 }
 
-export function CategoryCircles({ items, variant }: { items: { label: string; href: string; image: string }[]; variant: ThemeKey }) {
+export function CategoryCircles({ items, variant: theme }: { items: { label: string; href: string; image: string }[]; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   return (
     <section className="container-x py-8 md:py-10">
       <div className="no-scrollbar -mx-4 flex gap-4 overflow-x-auto px-4 md:mx-0 md:grid md:grid-cols-6 md:px-0 lg:grid-cols-12 lg:gap-3">
@@ -139,7 +152,8 @@ export function CategoryCircles({ items, variant }: { items: { label: string; hr
 
 /* ---------------- Marka şeridi ---------------- */
 
-export function BrandStrip({ brands, variant, title = "Markalar" }: { brands: { name: string; slug: string; count: number }[]; variant: ThemeKey; title?: string }) {
+export function BrandStrip({ brands, variant: theme, title = "Markalar" }: { brands: { name: string; slug: string; count: number }[]; variant: ThemeKey; title?: string }) {
+  const variant = styleOf(theme);
   if (!brands.length) return null;
   if (variant === "neon") {
     const row = [...brands, ...brands];
@@ -157,7 +171,7 @@ export function BrandStrip({ brands, variant, title = "Markalar" }: { brands: { 
   }
   return (
     <section className="container-x py-10 md:py-14">
-      <SectionHeading title={title} subtitle={variant === "studio" ? "Seçkimizdeki markalar" : "Dünyanın en sevilen sneaker markaları"} href="/markalar" linkLabel="Tüm Markalar" variant={variant} />
+      <SectionHeading title={title} subtitle={variant === "studio" ? "Seçkimizdeki markalar" : "Dünyanın en sevilen sneaker markaları"} href="/markalar" linkLabel="Tüm Markalar" variant={theme} />
       <div className={clsx("grid grid-cols-3 gap-2 sm:grid-cols-4 md:gap-3 lg:grid-cols-7")}>
         {brands.slice(0, 14).map((b) => (
           <Link
@@ -180,7 +194,8 @@ export function BrandStrip({ brands, variant, title = "Markalar" }: { brands: { 
 
 /* ---------------- Kampanya bannerları ---------------- */
 
-export function PromoBanners({ banners, variant, layout = "2" }: { banners: PromoBanner[]; variant: ThemeKey; layout?: "2" | "4" | "1+2" }) {
+export function PromoBanners({ banners, variant: theme, layout = "2" }: { banners: PromoBanner[]; variant: ThemeKey; layout?: "2" | "4" | "1+2" }) {
+  const variant = styleOf(theme);
   if (!banners.length) return null;
   const rounded = variant === "pulse" || variant === "arena" ? "rounded-theme-lg" : "";
   const card = (b: PromoBanner, cls?: string) => (
@@ -225,7 +240,8 @@ export function PromoBanners({ banners, variant, layout = "2" }: { banners: Prom
 
 /* ---------------- Avantajlar ---------------- */
 
-export function USPBar({ site, variant }: { site: SiteContext; variant: ThemeKey }) {
+export function USPBar({ site, variant: theme }: { site: SiteContext; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const s = site.settings;
   const items = [
     { icon: Truck, title: "Ücretsiz Kargo", body: `${formatPrice(s.shipping.freeShippingThreshold * 100).replace(",00", "")} ve üzeri siparişlerde` },
@@ -254,11 +270,12 @@ export function USPBar({ site, variant }: { site: SiteContext; variant: ThemeKey
 
 /* ---------------- Popüler seriler ---------------- */
 
-export function SeriesTiles({ series, variant, title = "Popüler Modeller" }: { series: { label: string; slug: string; image: string; count: number }[]; variant: ThemeKey; title?: string }) {
+export function SeriesTiles({ series, variant: theme, title = "Popüler Modeller" }: { series: { label: string; slug: string; image: string; count: number }[]; variant: ThemeKey; title?: string }) {
+  const variant = styleOf(theme);
   if (!series.length) return null;
   return (
     <section className="container-x py-10 md:py-14">
-      <SectionHeading title={title} subtitle="En çok aranan ikonik silüetler" variant={variant} />
+      <SectionHeading title={title} subtitle="En çok aranan ikonik silüetler" variant={theme} />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-6">
         {series.slice(0, 12).map((s) => (
           <Link key={s.slug} href={`/seri/${s.slug}`} className={clsx("group relative overflow-hidden bg-soft", variant === "pulse" || variant === "arena" ? "rounded-theme-lg" : "")}>
@@ -279,12 +296,13 @@ export function SeriesTiles({ series, variant, title = "Popüler Modeller" }: { 
 
 /* ---------------- Drop takvimi ---------------- */
 
-export function UpcomingDrops({ items, variant }: { items: CardProduct[]; variant: ThemeKey }) {
+export function UpcomingDrops({ items, variant: theme }: { items: CardProduct[]; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   if (!items.length) return null;
   return (
     <section className={clsx("py-12 md:py-16", variant === "neon" ? "bg-card" : "bg-soft")}>
       <div className="container-x">
-        <SectionHeading title="Yakında Çıkacaklar" subtitle="Drop takvimi" href="/yakinda" linkLabel="Tüm Takvim" variant={variant} />
+        <SectionHeading title="Yakında Çıkacaklar" subtitle="Drop takvimi" href="/yakinda" linkLabel="Tüm Takvim" variant={theme} />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {items.slice(0, 3).map((p) => (
             <Link key={p.id} href={`/urun/${p.slug}`} className={clsx("group grid grid-cols-[120px_1fr] items-center gap-4 border border-line bg-bg p-3 md:grid-cols-[150px_1fr]", variant === "pulse" && "rounded-theme-lg")}>
@@ -310,7 +328,8 @@ export function UpcomingDrops({ items, variant }: { items: CardProduct[]; varian
 
 /* ---------------- Günün fırsatı ---------------- */
 
-export function DealOfTheDay({ p, variant }: { p: CardProduct; variant: ThemeKey }) {
+export function DealOfTheDay({ p, variant: theme }: { p: CardProduct; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const midnight = new Date();
   midnight.setHours(24, 0, 0, 0);
   return (
@@ -366,7 +385,8 @@ export function EditorialSplit({ title, body, href, cta, image, reverse }: { tit
   );
 }
 
-export function MarqueeBand({ words, variant }: { words: string[]; variant: ThemeKey }) {
+export function MarqueeBand({ words, variant: theme }: { words: string[]; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const row = [...words, ...words, ...words];
   return (
     <div className={clsx("overflow-hidden py-5", variant === "neon" ? "bg-primary text-black" : "bg-fg text-bg")}>
@@ -383,11 +403,12 @@ export function MarqueeBand({ words, variant }: { words: string[]; variant: Them
 
 /* ---------------- Blog ---------------- */
 
-export function BlogTeasers({ posts, variant }: { posts: BlogPost[]; variant: ThemeKey }) {
+export function BlogTeasers({ posts, variant: theme }: { posts: BlogPost[]; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   if (!posts.length) return null;
   return (
     <section className="container-x py-10 md:py-14">
-      <SectionHeading title={variant === "studio" ? "Dergi" : "Blog & Rehber"} subtitle="Sneaker kültürü, bakım ve stil önerileri" href="/blog" linkLabel="Tüm Yazılar" variant={variant} />
+      <SectionHeading title={variant === "studio" ? "Dergi" : "Blog & Rehber"} subtitle="Sneaker kültürü, bakım ve stil önerileri" href="/blog" linkLabel="Tüm Yazılar" variant={theme} />
       <div className="grid gap-6 md:grid-cols-3">
         {posts.slice(0, 3).map((p) => (
           <Link key={p.id} href={`/blog/${p.slug}`} className="group">

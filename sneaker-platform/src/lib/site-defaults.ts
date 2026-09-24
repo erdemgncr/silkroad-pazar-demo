@@ -32,6 +32,27 @@ export function defaultSettings(opts: { name: string; slug: string; theme: Theme
       { eyebrow: "Fırsat", title: "Haftanın Fırsatları", subtitle: "Seçili ürünlerde %40'a varan indirim.", cta: "Fırsatları Gör", href: "/indirim", image: img("hero-2"), bg: "#f97316", fg: "#ffffff" },
       { eyebrow: "Basketbol", title: "Sahaya Çık", subtitle: "Luka, Giannis ve MB serisi basketbol ayakkabıları.", cta: "Basketbol", href: "/basketbol-ayakkabisi", image: img("hero-3"), bg: "#111827", fg: "#ffffff" },
     ],
+    volt: [
+      { eyebrow: "Yeni Sezon", title: "Adımını Büyük At", subtitle: "Sezonun en çok konuşulan modelleri, sınırlı bedenlerle stokta.", cta: "Keşfet", href: "/yeni-gelenler", image: img("hero-1"), bg: "#111111", fg: "#ffffff" },
+      { eyebrow: "Online Özel", title: "Retro Koşu Günleri", subtitle: "9060, 2002R ve Gel-1130: arşivden gelen silüetler.", cta: "Modelleri Gör", href: "/sneaker", image: img("hero-2"), bg: "#1f1bff", fg: "#ffffff" },
+      { eyebrow: "İndirim", title: "Sezon Sonu Fırsatları", subtitle: "Seçili modellerde %40'a varan indirim.", cta: "Alışverişe Başla", href: "/indirim", image: img("hero-3"), bg: "#e11d2e", fg: "#ffffff" },
+    ],
+    metro: [
+      { eyebrow: "Uygulamaya Özel", title: "Seçili Ürünlerde %15 İndirim", subtitle: "Trend modellerde sepette ekstra indirim fırsatı.", cta: "Hemen Keşfet", href: "/cok-satanlar", image: img("hero-1"), bg: "#111111", fg: "#ffffff" },
+      { eyebrow: "Yeni Sezon", title: "Trend Modeller Burada", subtitle: "Samba, 9060, Dunk ve daha fazlası yeni renkleriyle.", cta: "Yeni Gelenler", href: "/yeni-gelenler", image: img("hero-2"), bg: "#d0021b", fg: "#ffffff" },
+      { eyebrow: "Çocuk", title: "Minik Adımlar, Büyük Stil", subtitle: "Çocuklar için rahat ve dayanıklı sneakerlar.", cta: "Çocuk Ürünleri", href: "/cocuk", image: img("hero-3"), bg: "#f4f4f4", fg: "#111111" },
+    ],
+    brut: [
+      { eyebrow: "Drop 07", title: "Sokak Senin. Kuralları Sen Koy.", subtitle: "Streetwear'in en sert parçaları ve ikonik sneakerlar.", cta: "Drop'u Gör", href: "/yeni-gelenler", image: img("hero-1"), bg: "#ffe600", fg: "#0a0a0a" },
+    ],
+    luxe: [
+      { eyebrow: "Özel Koleksiyon", title: "Nadir Olanın Adresi", subtitle: "Sınırlı üretim modeller, orijinallik garantisiyle ve özenle paketlenerek kapında.", cta: "Koleksiyonu Keşfet", href: "/yeni-gelenler", image: img("hero-1"), bg: "#0b0b0c", fg: "#f3efe6" },
+    ],
+    outlet: [
+      { eyebrow: "Büyük Outlet", title: "%70'e Varan İndirim", subtitle: "Binlerce üründe sezonun en düşük fiyatları.", cta: "Fırsatları Gör", href: "/indirim", image: img("hero-1"), bg: "#ff6000", fg: "#ffffff" },
+      { eyebrow: "Sadece Bugün", title: "Sepette Ekstra İndirim", subtitle: "Seçili markalarda sepette ek indirim.", cta: "Alışverişe Başla", href: "/indirim", image: img("hero-2"), bg: "#e3001b", fg: "#ffffff" },
+      { eyebrow: "Yeni Eklenenler", title: "Outlet'e Yeni Gelenler", subtitle: "Her gün yeni ürünler outlet fiyatlarıyla.", cta: "Keşfet", href: "/yeni-gelenler", image: img("hero-3"), bg: "#1b1b1b", fg: "#ffffff" },
+    ],
   };
   return siteSettingsSchema.parse({
     tagline: "Orijinal sneaker, spor giyim ve aksesuar",

@@ -5,13 +5,13 @@ import { Children, useCallback, useEffect, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { HeroSlide } from "@/lib/site-settings";
-import type { ThemeKey } from "@/themes/registry";
+import { styleOf, type StyleKey, type ThemeKey } from "@/themes/registry";
 
 /* ---------------- Yatay kaydırmalı ürün şeridi ---------------- */
 
 export function Carousel({
   children,
-  variant,
+  variant: theme,
   itemClass = "w-[46%] sm:w-[31%] lg:w-[23.5%]",
   arrows = "top",
 }: {
@@ -20,6 +20,7 @@ export function Carousel({
   itemClass?: string;
   arrows?: "top" | "side";
 }) {
+  const variant = styleOf(theme);
   const ref = useRef<HTMLDivElement>(null);
   const [edge, setEdge] = useState({ start: true, end: false });
   const update = useCallback(() => {
@@ -79,7 +80,8 @@ export function Carousel({
 
 /* ---------------- Hero slider ---------------- */
 
-export function HeroSlider({ slides, variant }: { slides: HeroSlide[]; variant: ThemeKey }) {
+export function HeroSlider({ slides, variant: theme }: { slides: HeroSlide[]; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   useEffect(() => {
@@ -214,7 +216,8 @@ export function Countdown({ to, className, compact }: { to: string; className?: 
 
 /* ---------------- Sekmeler ---------------- */
 
-export function Tabs({ tabs, variant }: { tabs: { label: string; content: React.ReactNode }[]; variant: ThemeKey }) {
+export function Tabs({ tabs, variant: theme }: { tabs: { label: string; content: React.ReactNode }[]; variant: ThemeKey }) {
+  const variant = styleOf(theme);
   const [i, setI] = useState(0);
   return (
     <div>

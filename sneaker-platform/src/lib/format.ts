@@ -75,3 +75,8 @@ export function joinTr(items: string[]): string {
   if (items.length <= 1) return items.join("");
   return `${items.slice(0, -1).join(", ")} ve ${items[items.length - 1]}`;
 }
+
+/** Sipariş kalemi adı: başlık markayı zaten içeriyorsa tekrar etmez. */
+export function itemName(brand: string, title: string): string {
+  return trLower(title).startsWith(trLower(brand)) ? title : `${brand} ${title}`;
+}

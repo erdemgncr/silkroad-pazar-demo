@@ -6,13 +6,16 @@
  *  - Her tema için bir örnek site
  * Kullanım: npm run db:seed
  */
+import "./load-env.mjs";
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
-import { db, schema } from "../src/db";
+import { closeDb, db, schema } from "../src/db";
 import { buildDemoCatalog } from "../src/data/demo-catalog";
 import { createSite } from "../src/lib/site-factory";
 import { POOL_KEY, importFromPool } from "../src/lib/catalog-admin";
 import { PLANS } from "../src/lib/plans";
+import { getPlatformSetting, setPlatformSetting } from "../src/lib/platform-settings";
+import { seedDemoActivity, seedSecondMerchant } from "./seed-demo";
 
 const DEMO_SITES = [
   { name: "Kickshane", slug: "kickshane", theme: "urban", city: "İstanbul" },
@@ -20,6 +23,11 @@ const DEMO_SITES = [
   { name: "HypeDrop", slug: "hypedrop", theme: "neon", city: "İzmir" },
   { name: "Kundura Studio", slug: "kundura", theme: "studio", city: "İstanbul" },
   { name: "Zıpla Spor", slug: "zipla", theme: "pulse", city: "Bursa" },
+  { name: "Voltaj", slug: "voltaj", theme: "volt", city: "İstanbul" },
+  { name: "Pasaj Sneaker", slug: "pasaj", theme: "metro", city: "Antalya" },
+  { name: "Kaldırım", slug: "kaldirim", theme: "brut", city: "İzmir" },
+  { name: "Nadir Çift", slug: "nadircift", theme: "luxe", city: "İstanbul" },
+  { name: "Kelepir Spor", slug: "kelepir", theme: "outlet", city: "Konya" },
 ] as const;
 
 async function upsertUser(email: string, password: string, data: { name: string; role: "owner" | "merchant_owner"; merchantId: number | null }) {
@@ -93,10 +101,21 @@ async function main() {
     ]);
   }
 
+  console.log("→ Platform ayarları");
+  if (!(await db.query.platformSettings.findFirst({ where: eq(schema.platformSettings.key, "general") }))) {
+    // Demo: satıcı kaydı açık, 14 gün deneme
+    await setPlatformSetting("general", { ...(await getPlatformSetting("general")), signupOpen: true, supportEmail: "destek@sneakeros.local", trialDays: 14 });
+  }
+
+  console.log("→ Demo işlemler");
+  await seedSecondMerchant();
+  await seedDemoActivity();
+
   console.log(`\nHazır.`);
   console.log(`  Platform paneli: http://localhost:3000/panel  (${adminEmail} / ${adminPassword})`);
   console.log(`  Satıcı paneli:   http://localhost:3000/panel  (${merchantEmail} / ${merchantPassword})`);
   for (const s of siteRows) console.log(`  ${s.name}: http://${s.slug}.localhost:3000`);
+  await closeDb();
   process.exit(0);
 }
 

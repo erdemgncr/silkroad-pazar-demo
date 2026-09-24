@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { clsx } from "clsx";
 import { CircleAlert, Lock, X } from "lucide-react";
-import type { ThemeKey } from "@/themes/registry";
+import { styleOf, type StyleKey, type ThemeKey } from "@/themes/registry";
 import { TR_CITIES } from "@/lib/tr-cities";
 import { formatPrice } from "@/lib/format";
 import { placeOrderAction, type CheckoutInput } from "@/lib/actions/checkout";
@@ -80,7 +80,8 @@ function AgreementModal({ slug, title, onClose }: { slug: string; title: string;
   );
 }
 
-export function CheckoutForm({ variant, customer, addresses }: { variant: ThemeKey; customer: { email: string; name: string; phone: string } | null; addresses: SavedAddress[] }) {
+export function CheckoutForm({ variant: theme, customer, addresses }: { variant: ThemeKey; customer: { email: string; name: string; phone: string } | null; addresses: SavedAddress[] }) {
+  const variant = styleOf(theme);
   const { cart, hydrated } = useStore();
   const router = useRouter();
   const [coupon, setCoupon] = useCoupon();
@@ -226,7 +227,7 @@ export function CheckoutForm({ variant, customer, addresses }: { variant: ThemeK
       </div>
 
       <aside className="lg:sticky lg:top-28 lg:self-start">
-        <Summary pricing={pricing} loading={loading} variant={variant}>
+        <Summary pricing={pricing} loading={loading} variant={theme}>
           <ul className="mt-4 max-h-64 space-y-3 overflow-y-auto border-t border-line pt-4">
             {cart.map((l) => (
               <li key={l.key} className="flex gap-3">

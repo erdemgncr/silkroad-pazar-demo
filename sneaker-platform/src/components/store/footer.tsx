@@ -53,13 +53,15 @@ const COLUMNS: { title: string; links: [string, string][] }[] = [
 ];
 
 export function Footer({ site }: { site: SiteContext }) {
-  const t = site.theme;
+  const theme = site.theme;
+  // Yeni temalar, alt bilgi düzenini en yakın temel temadan devralır.
+  const t = ({ volt: "urban", metro: "arena", brut: "urban", luxe: "neon", outlet: "arena" } as Record<string, string>)[theme] ?? theme;
   const s = site.settings;
   const dark = t === "urban" || t === "neon";
   const wrap: Record<string, string> = {
-    urban: "bg-black text-white",
-    neon: "bg-[#050505] text-white border-t border-line",
-    arena: "bg-soft text-fg",
+    urban: theme === "brut" ? "bg-[#0a0a0a] text-white border-t-2 border-fg" : "bg-black text-white",
+    neon: theme === "luxe" ? "bg-[#070707] text-white border-t border-line" : "bg-[#050505] text-white border-t border-line",
+    arena: theme === "metro" ? "bg-soft text-fg border-t border-line" : "bg-soft text-fg",
     studio: "bg-soft text-fg border-t border-line",
     pulse: "bg-[#0f172a] text-white",
   };
@@ -70,23 +72,29 @@ export function Footer({ site }: { site: SiteContext }) {
   return (
     <footer className={clsx(wrap[t])}>
       {/* Bülten bandı */}
-      <div className={clsx(t === "pulse" ? "bg-primary text-primary-fg" : t === "arena" ? "bg-primary text-primary-fg" : "", "border-b", dark || t === "pulse" ? "border-white/10" : "border-line")}>
+      <div
+        className={clsx(
+          theme === "brut" ? "border-b-2 border-fg bg-accent text-black" : theme === "metro" ? "bg-accent text-white" : t === "pulse" || t === "arena" ? "bg-primary text-primary-fg" : "",
+          theme !== "brut" && "border-b",
+          dark || t === "pulse" ? "border-white/10" : "border-line",
+        )}
+      >
         <div className="container-x grid gap-6 py-10 md:grid-cols-2 md:items-center md:py-12">
           <div>
             <p className={clsx("font-heading font-bold h-display", t === "studio" ? "text-3xl" : t === "neon" ? "text-4xl" : "text-2xl md:text-3xl")}>
               {t === "studio" ? "Bültene katılın" : "İlk sen haberdar ol"}
             </p>
-            <p className={clsx("mt-2 max-w-md text-sm", dark || t === "pulse" || t === "arena" ? "text-current opacity-75" : "text-muted")}>
+            <p className={clsx("mt-2 max-w-md text-sm", dark || t === "pulse" || t === "arena" || theme === "brut" ? "text-current opacity-75" : "text-muted")}>
               Yeni gelen modeller, özel indirimler ve drop tarihleri e-posta kutunda. Üyelere özel kampanyaları kaçırma.
             </p>
           </div>
-          <NewsletterForm variant={dark || t === "pulse" || t === "arena" ? "dark" : "light"} rounded={t === "pulse" ? "rounded-full" : t === "arena" ? "rounded-lg" : ""} />
+          <NewsletterForm variant={(dark || t === "pulse" || t === "arena") && theme !== "brut" ? "dark" : "light"} rounded={t === "pulse" ? "rounded-full" : t === "arena" ? "rounded-lg" : ""} />
         </div>
       </div>
 
       <div className="container-x grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-6">
         <div className="lg:col-span-2">
-          <div className={clsx(t === "neon" && "[&_span]:!text-primary")}>
+          <div className={clsx(theme === "neon" && "[&_span]:!text-primary")}>
             <Logo site={site} />
           </div>
           <p className={clsx("mt-4 max-w-sm text-sm leading-relaxed", mutedCls)}>{s.footerText}</p>
@@ -145,7 +153,7 @@ export function Footer({ site }: { site: SiteContext }) {
         ))}
       </div>
 
-      {t === "neon" && (
+      {(theme === "neon" || theme === "volt") && (
         <div className="container-x overflow-hidden">
           <p className="select-none whitespace-nowrap font-heading text-[18vw] uppercase leading-[0.8] text-white/[0.04]" aria-hidden>
             {site.settings.logoText || site.name}

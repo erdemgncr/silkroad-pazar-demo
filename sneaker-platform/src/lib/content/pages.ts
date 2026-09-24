@@ -451,7 +451,7 @@ Son güncelleme: {updated}`,
 
 ## Kullandığımız Çerez Türleri
 - **Zorunlu çerezler:** Sepet, oturum ve güvenlik işlevleri için gereklidir; kapatılamaz.
-- **İşlevsel çerezler:** Favoriler ve son gezilen ürünler gibi tercihlerini hatırlar.
+- **İşlevsel çerezler:** Sepetin ve son gezdiğin ürünler gibi tercihlerini hatırlar.
 - **Analitik çerezler:** Siteyi nasıl kullandığını anonim olarak ölçmemize yardımcı olur (örn. Google Analytics). Yalnızca onay vermen halinde çalışır.
 - **Pazarlama çerezleri:** İlgi alanlarına uygun reklamlar gösterilmesini sağlar (örn. Meta Pixel). Yalnızca onay vermen halinde çalışır.
 

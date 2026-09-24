@@ -2,6 +2,7 @@ import Link from "next/link";
 import { clsx } from "clsx";
 import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
 import type { SiteContext } from "@/lib/site";
+import { styleOf, type ThemeKey } from "@/themes/registry";
 import type { CatalogProduct, Crumb, ListingQuery, ListingResult } from "@/lib/catalog";
 import type { ListingCopy } from "@/lib/seo/copy";
 import { toCards } from "@/lib/store-data";
@@ -31,14 +32,15 @@ function pageHref(basePath: string, q: ListingQuery, page: number): string {
   return s ? `${basePath}?${s}` : basePath;
 }
 
-function Pagination({ basePath, q, page, pageCount, variant }: { basePath: string; q: ListingQuery; page: number; pageCount: number; variant: SiteContext["theme"] }) {
+function Pagination({ basePath, q, page, pageCount, variant }: { basePath: string; q: ListingQuery; page: number; pageCount: number; variant: ThemeKey }) {
+  const v = styleOf(variant);
   if (pageCount < 2) return null;
   const pages: (number | "…")[] = [];
   for (let i = 1; i <= pageCount; i++) {
     if (i === 1 || i === pageCount || Math.abs(i - page) <= 1) pages.push(i);
     else if (pages[pages.length - 1] !== "…") pages.push("…");
   }
-  const box = clsx("grid h-10 min-w-10 place-items-center border px-3 text-sm font-semibold", variant === "pulse" ? "rounded-full" : variant === "arena" ? "rounded-theme" : "");
+  const box = clsx("grid h-10 min-w-10 place-items-center border px-3 text-sm font-semibold", v === "pulse" ? "rounded-full" : v === "arena" ? "rounded-theme" : "");
   return (
     <nav aria-label="Sayfalama" className="mt-12 flex items-center justify-center gap-1.5">
       {page > 1 ? (
@@ -99,10 +101,22 @@ export function ListingView({
   hideGender?: boolean;
   showSeo?: boolean;
 }) {
-  const v = site.theme;
+  const theme = site.theme;
+  const v = styleOf(theme);
   const cards = toCards(result.items, all);
-  const layout = v === "arena" ? "bar" : v === "neon" || v === "studio" ? "drawer" : "sidebar";
-  const cols = layout === "sidebar" ? 3 : v === "studio" ? 3 : 4;
+  const LAYOUT: Record<ThemeKey, ["bar" | "drawer" | "sidebar", 3 | 4]> = {
+    urban: ["sidebar", 3],
+    arena: ["bar", 4],
+    neon: ["drawer", 4],
+    studio: ["drawer", 3],
+    pulse: ["sidebar", 3],
+    volt: ["drawer", 4],
+    metro: ["sidebar", 3],
+    brut: ["bar", 4],
+    luxe: ["drawer", 3],
+    outlet: ["sidebar", 4],
+  };
+  const [layout, cols] = LAYOUT[theme];
 
   const header = (
     <div className={clsx("pb-6 pt-6 md:pt-8", v === "studio" && "text-center")}>
@@ -148,10 +162,10 @@ export function ListingView({
     <div className="mb-5 flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <FilterDrawerButton facets={result.facets} variant={v} total={result.total} hideGender={hideGender} alwaysVisible={layout === "drawer"} />
-          {layout === "bar" && <FilterBar facets={result.facets} variant={v} hideGender={hideGender} />}
+          <FilterDrawerButton facets={result.facets} variant={theme} total={result.total} hideGender={hideGender} alwaysVisible={layout === "drawer"} />
+          {layout === "bar" && <FilterBar facets={result.facets} variant={theme} hideGender={hideGender} />}
         </div>
-        <SortSelect variant={v} />
+        <SortSelect variant={theme} />
       </div>
       <ActiveFilters facets={result.facets} />
     </div>
@@ -160,8 +174,8 @@ export function ListingView({
   const grid =
     cards.length > 0 ? (
       <>
-        <ProductGrid items={cards} variant={v} cols={cols as 3 | 4} />
-        <Pagination basePath={basePath} q={query} page={result.page} pageCount={result.pageCount} variant={v} />
+        <ProductGrid items={cards} variant={theme} cols={cols as 3 | 4} />
+        <Pagination basePath={basePath} q={query} page={result.page} pageCount={result.pageCount} variant={theme} />
       </>
     ) : (
       <div className="flex flex-col items-center justify-center gap-3 rounded-theme-lg bg-soft px-6 py-20 text-center">
@@ -180,7 +194,7 @@ export function ListingView({
       {header}
       {layout === "sidebar" ? (
         <div className="grid gap-8 lg:grid-cols-[260px_1fr] xl:gap-10">
-          <FilterSidebar facets={result.facets} variant={v} hideGender={hideGender} />
+          <FilterSidebar facets={result.facets} variant={theme} hideGender={hideGender} />
           <div>
             {toolbar}
             {grid}
