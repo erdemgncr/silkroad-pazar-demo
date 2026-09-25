@@ -105,7 +105,7 @@ async function Plan() {
           ["Ürün", products, merchant.productLimit],
           ["AI metin (bu ay)", aiUsed, merchant.geminiApiKey ? Infinity : merchant.aiMonthlyLimit],
         ].map(([l, u, lim]) => (
-          <div key={l as string} className="rounded-xl border border-zinc-200 bg-white p-5">
+          <div key={l as string} className="glass rounded-3xl p-5">
             <p className="text-sm text-zinc-500">{l as string}</p>
             <p className="mt-1 text-2xl font-bold tabular-nums">
               {u as number} <span className="text-base font-medium text-zinc-400">/ {lim === Infinity ? "∞" : (lim as number)}</span>
@@ -155,7 +155,7 @@ async function Plan() {
         {invoices.length === 0 ? (
           <p className="text-sm text-zinc-500">Henüz ödeme yok.</p>
         ) : (
-          <ul className="divide-y divide-zinc-100 text-sm">
+          <ul className="divide-y divide-black/5 text-sm">
             {invoices.map((i) => (
               <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
                 <Link href={`/panel/abonelik/${i.id}`} className="font-semibold hover:underline">
@@ -237,7 +237,7 @@ async function Team() {
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
       <Card title={`Kullanıcılar (${users.length})`}>
-        <ul className="divide-y divide-zinc-100">
+        <ul className="divide-y divide-black/5">
           {users.map((u) => (
             <li key={u.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
               <div className="flex items-center gap-3">

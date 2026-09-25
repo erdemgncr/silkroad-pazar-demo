@@ -56,16 +56,16 @@ export function ProductTable({ rows, scope, base, sites = [], accounts = [] }: {
           {sel.length > 0 && (
             <>
               <span className="mx-1 h-5 w-px bg-zinc-200" />
-              <button type="button" disabled={pending} onClick={() => run(() => bulkProducts(scope, sel, "activate"))} className="h-8 rounded-lg border border-zinc-300 px-3 text-xs font-semibold hover:bg-zinc-50">
+              <button type="button" disabled={pending} onClick={() => run(() => bulkProducts(scope, sel, "activate"))} className="h-8 rounded-full border border-black/10 bg-white/70 px-4 text-xs font-semibold hover:bg-white">
                 Satışa aç
               </button>
-              <button type="button" disabled={pending} onClick={() => run(() => bulkProducts(scope, sel, "deactivate"))} className="h-8 rounded-lg border border-zinc-300 px-3 text-xs font-semibold hover:bg-zinc-50">
+              <button type="button" disabled={pending} onClick={() => run(() => bulkProducts(scope, sel, "deactivate"))} className="h-8 rounded-full border border-black/10 bg-white/70 px-4 text-xs font-semibold hover:bg-white">
                 Satıştan kaldır
               </button>
-              <button type="button" disabled={pending} onClick={() => run(() => bulkProducts(scope, sel, "featured-on"))} className="h-8 rounded-lg border border-zinc-300 px-3 text-xs font-semibold hover:bg-zinc-50">
+              <button type="button" disabled={pending} onClick={() => run(() => bulkProducts(scope, sel, "featured-on"))} className="h-8 rounded-full border border-black/10 bg-white/70 px-4 text-xs font-semibold hover:bg-white">
                 Öne çıkar
               </button>
-              <button type="button" disabled={pending} onClick={() => run(() => bulkProducts(scope, sel, "new-on"))} className="h-8 rounded-lg border border-zinc-300 px-3 text-xs font-semibold hover:bg-zinc-50">
+              <button type="button" disabled={pending} onClick={() => run(() => bulkProducts(scope, sel, "new-on"))} className="h-8 rounded-full border border-black/10 bg-white/70 px-4 text-xs font-semibold hover:bg-white">
                 Yeni işaretle
               </button>
               <button
@@ -75,7 +75,7 @@ export function ProductTable({ rows, scope, base, sites = [], accounts = [] }: {
                   const v = window.prompt("Fiyatlar yüzde kaç değişsin? (örn. 10 veya -15)");
                   if (v) run(() => bulkPrice(scope, sel, Number(v.replace(",", "."))));
                 }}
-                className="h-8 rounded-lg border border-zinc-300 px-3 text-xs font-semibold hover:bg-zinc-50"
+                className="h-8 rounded-full border border-black/10 bg-white/70 px-4 text-xs font-semibold hover:bg-white"
               >
                 Fiyat % değiştir
               </button>
@@ -95,7 +95,7 @@ export function ProductTable({ rows, scope, base, sites = [], accounts = [] }: {
                 </span>
               )}
               {accounts.length > 0 && (
-                <span className="flex items-center gap-1 rounded-lg border border-zinc-200 p-0.5 pl-2">
+                <span className="flex items-center gap-1 rounded-lg border border-black/10 p-0.5 pl-2">
                   <select value={acc} onChange={(e) => setAcc(Number(e.target.value))} className="h-7 max-w-[120px] bg-transparent text-xs font-medium outline-none">
                     {accounts.map((a) => (
                       <option key={a.id} value={a.id}>
@@ -103,7 +103,7 @@ export function ProductTable({ rows, scope, base, sites = [], accounts = [] }: {
                       </option>
                     ))}
                   </select>
-                  <button type="button" disabled={pending} onClick={() => run(() => pushToShopier(acc, sel))} className="h-7 rounded-md bg-zinc-900 px-2.5 text-xs font-semibold text-white">
+                  <button type="button" disabled={pending} onClick={() => run(() => pushToShopier(acc, sel))} className="h-7 rounded-full bg-zinc-900 px-2.5 text-xs font-semibold text-white">
                     {"Shopier'e gönder"}
                   </button>
                 </span>
@@ -122,9 +122,9 @@ export function ProductTable({ rows, scope, base, sites = [], accounts = [] }: {
         )}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+      <div className="overflow-hidden glass rounded-3xl">
         <table className="w-full text-sm">
-          <thead className="hidden bg-zinc-50 text-left text-xs text-zinc-500 md:table-header-group">
+          <thead className="hidden bg-white/40 text-left text-xs text-zinc-500 md:table-header-group">
             <tr>
               <th className="w-10 px-4 py-3" />
               <th className="px-2 py-3 font-medium">Ürün</th>
@@ -133,9 +133,9 @@ export function ProductTable({ rows, scope, base, sites = [], accounts = [] }: {
               <th className="hidden px-4 py-3 font-medium xl:table-cell">Durum</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100">
+          <tbody className="divide-y divide-black/5">
             {rows.map((p) => (
-              <tr key={p.id} className={clsx("hover:bg-zinc-50", sel.includes(p.id) && "bg-zinc-50")}>
+              <tr key={p.id} className={clsx("hover:bg-white/60", sel.includes(p.id) && "bg-zinc-50")}>
                 <td className="w-10 px-4 py-3 align-top md:align-middle">
                   <input type="checkbox" checked={sel.includes(p.id)} onChange={() => toggle(p.id)} className="h-4 w-4" aria-label={`${p.title} seç`} />
                 </td>

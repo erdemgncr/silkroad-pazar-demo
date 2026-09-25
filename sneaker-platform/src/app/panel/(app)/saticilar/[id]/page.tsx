@@ -69,7 +69,7 @@ export default async function MerchantPage({ params }: PageProps<"/panel/saticil
             {sites.length === 0 ? (
               <p className="text-sm text-zinc-500">Henüz site yok.</p>
             ) : (
-              <ul className="divide-y divide-zinc-100">
+              <ul className="divide-y divide-black/5">
                 {sites.map((s) => (
                   <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                     <div className="min-w-0">
@@ -82,7 +82,7 @@ export default async function MerchantPage({ params }: PageProps<"/panel/saticil
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge tone={s.status === "active" ? "green" : s.status === "draft" ? "amber" : "red"}>{s.status === "active" ? "Yayında" : s.status === "draft" ? "Taslak" : "Bakımda"}</Badge>
-                      <a href={siteUrl(s.slug, domains.filter((d) => d.siteId === s.id))} target="_blank" rel="noopener noreferrer" className="grid h-8 w-8 place-items-center rounded-lg border border-zinc-300">
+                      <a href={siteUrl(s.slug, domains.filter((d) => d.siteId === s.id))} target="_blank" rel="noopener noreferrer" className="grid h-8 w-8 place-items-center rounded-full border border-black/10 bg-white/70">
                         <ArrowUpRight size={14} />
                       </a>
                     </div>
@@ -92,7 +92,7 @@ export default async function MerchantPage({ params }: PageProps<"/panel/saticil
             )}
           </Card>
           <Card title="Panel kullanıcıları">
-            <ul className="divide-y divide-zinc-100">
+            <ul className="divide-y divide-black/5">
               {users.map((u) => (
                 <li key={u.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
                   <div>
@@ -114,7 +114,7 @@ export default async function MerchantPage({ params }: PageProps<"/panel/saticil
             {invoices.length === 0 ? (
               <p className="text-sm text-zinc-500">Henüz fatura yok.</p>
             ) : (
-              <ul className="divide-y divide-zinc-100 text-sm">
+              <ul className="divide-y divide-black/5 text-sm">
                 {invoices.map((i) => (
                   <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
                     <span className="font-semibold">{invoiceNo(i.id)}</span>
@@ -134,9 +134,9 @@ export default async function MerchantPage({ params }: PageProps<"/panel/saticil
                 ))}
               </ul>
             )}
-            <details className="mt-4 rounded-lg border border-zinc-200">
+            <details className="mt-4 rounded-lg border border-black/10">
               <summary className="cursor-pointer px-3 py-2 text-sm font-semibold">Elle fatura oluştur (özel fiyat / havale)</summary>
-              <div className="border-t border-zinc-100 p-3">
+              <div className="border-t border-black/5 p-3">
                 <ActionForm action={createManualInvoice.bind(null, m.id)} submitLabel="Fatura oluştur" resetOnSuccess>
                   <div className="grid grid-cols-3 gap-3">
                     <Select label="Paket" name="plan" defaultValue={m.plan} options={Object.values(PLANS).map((p) => ({ value: p.key, label: p.name }))} />

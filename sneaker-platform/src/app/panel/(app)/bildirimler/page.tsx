@@ -67,8 +67,8 @@ async function NotificationList({ merchantId, type, page }: { merchantId: number
       {rows.length === 0 ? (
         <Empty title="Bildirim yok" description="Yeni sipariş, iletişim mesajı, stok azalması ve Shopier hatalarında burada bildirim görürsün." />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
-          <ul className="divide-y divide-zinc-100">
+        <div className="overflow-hidden glass rounded-3xl">
+          <ul className="divide-y divide-black/5">
             {rows.map((r) => {
               const Icon = ICONS[r.type] ?? Bell;
               const inner = (
@@ -86,7 +86,7 @@ async function NotificationList({ merchantId, type, page }: { merchantId: number
                   </div>
                 </div>
               );
-              return <li key={r.id}>{r.link ? <Link href={r.link} className="block hover:bg-zinc-50">{inner}</Link> : inner}</li>;
+              return <li key={r.id}>{r.link ? <Link href={r.link} className="block hover:bg-white/60">{inner}</Link> : inner}</li>;
             })}
           </ul>
         </div>
@@ -135,9 +135,9 @@ async function EmailLogs({ merchantId, status, page }: { merchantId: number | nu
       {rows.length === 0 ? (
         <Empty title="E-posta kaydı yok" />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div className="overflow-hidden glass rounded-3xl">
           <table className="w-full text-sm">
-            <thead className="hidden bg-zinc-50 text-left text-xs text-zinc-500 md:table-header-group">
+            <thead className="hidden bg-white/40 text-left text-xs text-zinc-500 md:table-header-group">
               <tr>
                 <th className="px-4 py-3 font-medium">Konu / Alıcı</th>
                 <th className="px-4 py-3 font-medium">Şablon</th>
@@ -145,7 +145,7 @@ async function EmailLogs({ merchantId, status, page }: { merchantId: number | nu
                 <th className="px-4 py-3 font-medium">Tarih</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-black/5">
               {rows.map((r) => (
                 <tr key={r.id}>
                   <td className="px-4 py-3">

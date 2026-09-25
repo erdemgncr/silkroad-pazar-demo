@@ -30,7 +30,7 @@ export function NewSiteForm({ themes, merchants, currentMerchantId, rootDomain }
   const [slugTouched, setSlugTouched] = useState(false);
   return (
     <form action={action} className="space-y-8">
-      <section className="rounded-xl border border-zinc-200 bg-white p-5">
+      <section className="glass rounded-3xl p-5">
         <h2 className="font-semibold">1. Tema seç</h2>
         <p className="mt-1 text-sm text-zinc-500">Temayı daha sonra tek tıkla değiştirebilirsin.</p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
@@ -48,7 +48,7 @@ export function NewSiteForm({ themes, merchants, currentMerchantId, rootDomain }
           ))}
         </div>
       </section>
-      <section className="rounded-xl border border-zinc-200 bg-white p-5">
+      <section className="glass rounded-3xl p-5">
         <h2 className="font-semibold">2. Site bilgileri</h2>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {merchants && merchants.length > 0 && (
@@ -80,7 +80,7 @@ export function NewSiteForm({ themes, merchants, currentMerchantId, rootDomain }
           </label>
           <label>
             <span className={labelCls}>Site adresi</span>
-            <div className="flex items-center rounded-lg border border-zinc-300 bg-white focus-within:border-zinc-900">
+            <div className="flex items-center rounded-xl border border-black/10 bg-white focus-within:border-zinc-900">
               <input
                 name="slug"
                 value={slug}

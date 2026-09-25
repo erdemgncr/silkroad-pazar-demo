@@ -10,7 +10,7 @@ import {
   ChevronDown,
   CircleUser,
   Globe,
-  LayoutDashboard,
+  LayoutGrid,
   Library,
   LogOut,
   Mail,
@@ -21,15 +21,16 @@ import {
   Plug,
   Receipt,
   Settings,
-  ShoppingBag,
+  ShieldCheck,
   Ticket,
   Users,
   X,
 } from "lucide-react";
 import { markAllNotificationsRead, markNotificationRead, switchMerchant } from "@/lib/actions/panel-common";
 
-type Item = { href: string; label: string; icon: React.ComponentType<{ size?: number; className?: string }>; badge?: number };
-type Group = { title: string; items: Item[] };
+type Icon = React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
+type Tab = { href: string; label: string; badge?: number };
+type SheetItem = { href: string; label: string; desc: string; icon: Icon; badge?: number };
 
 export type ShellNotification = { id: number; type: string; title: string; body: string; link: string | null; read: boolean; at: string };
 
@@ -82,6 +83,15 @@ function useOutside(ref: React.RefObject<HTMLElement | null>, onOut: () => void,
   }, [ref, onOut, active]);
 }
 
+/** SneakerOS yazı logosu. */
+export function Wordmark({ className }: { className?: string }) {
+  return (
+    <span className={clsx("font-[800] tracking-[-0.045em]", className)}>
+      Sneaker<span className="text-zinc-400">OS</span>
+    </span>
+  );
+}
+
 function NotificationBell({ items, unread }: { items: ShellNotification[]; unread: number }) {
   const [open, setOpen] = useState(false);
   const [, start] = useTransition();
@@ -89,13 +99,13 @@ function NotificationBell({ items, unread }: { items: ShellNotification[]; unrea
   useOutside(ref, () => setOpen(false), open);
   return (
     <div ref={ref} className="relative">
-      <button type="button" onClick={() => setOpen(!open)} aria-label={`Bildirimler, ${unread} okunmamış`} className="relative grid h-10 w-10 place-items-center rounded-lg hover:bg-zinc-100">
-        <Bell size={20} />
-        {unread > 0 && <span className="absolute right-1.5 top-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-white">{unread > 99 ? "99+" : unread}</span>}
+      <button type="button" onClick={() => setOpen(!open)} aria-label={`Bildirimler, ${unread} okunmamış`} className="relative grid h-10 w-10 place-items-center rounded-full border border-black/5 bg-white/60 hover:bg-white">
+        <Bell size={18} strokeWidth={1.8} />
+        {unread > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-zinc-900 px-1 text-[10px] font-bold text-white">{unread > 99 ? "99+" : unread}</span>}
       </button>
       {open && (
-        <div className="fixed inset-x-3 top-16 z-50 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-[380px]">
-          <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
+        <div className="glass-strong fixed inset-x-3 top-[68px] z-50 overflow-hidden rounded-3xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-[380px]">
+          <div className="flex items-center justify-between px-5 py-4">
             <p className="font-semibold">Bildirimler</p>
             {unread > 0 && (
               <button type="button" onClick={() => start(() => markAllNotificationsRead())} className="text-xs font-semibold text-zinc-500 hover:text-zinc-900">
@@ -103,11 +113,11 @@ function NotificationBell({ items, unread }: { items: ShellNotification[]; unrea
               </button>
             )}
           </div>
-          <ul className="max-h-[60vh] divide-y divide-zinc-100 overflow-y-auto">
-            {items.length === 0 && <li className="px-4 py-10 text-center text-sm text-zinc-500">Henüz bildirim yok.</li>}
+          <ul className="max-h-[60vh] divide-y divide-black/5 overflow-y-auto border-y border-black/5">
+            {items.length === 0 && <li className="px-5 py-10 text-center text-sm text-zinc-500">Henüz bildirim yok.</li>}
             {items.map((n) => {
               const inner = (
-                <div className="flex gap-3 px-4 py-3">
+                <div className="flex gap-3 px-5 py-3">
                   <span className={clsx("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.read ? "bg-zinc-200" : (TYPE_DOT[n.type] ?? "bg-zinc-400"))} />
                   <div className="min-w-0 flex-1">
                     <p className={clsx("text-sm", !n.read && "font-semibold")}>{n.title}</p>
@@ -117,7 +127,7 @@ function NotificationBell({ items, unread }: { items: ShellNotification[]; unrea
                 </div>
               );
               return (
-                <li key={n.id} className={clsx(!n.read && "bg-orange-50/40")}>
+                <li key={n.id}>
                   {n.link ? (
                     <Link
                       href={n.link}
@@ -125,12 +135,12 @@ function NotificationBell({ items, unread }: { items: ShellNotification[]; unrea
                         setOpen(false);
                         if (!n.read) start(() => markNotificationRead(n.id));
                       }}
-                      className="block hover:bg-zinc-50"
+                      className="block hover:bg-white/70"
                     >
                       {inner}
                     </Link>
                   ) : (
-                    <button type="button" className="block w-full text-left hover:bg-zinc-50" onClick={() => !n.read && start(() => markNotificationRead(n.id))}>
+                    <button type="button" className="block w-full text-left hover:bg-white/70" onClick={() => !n.read && start(() => markNotificationRead(n.id))}>
                       {inner}
                     </button>
                   )}
@@ -138,7 +148,7 @@ function NotificationBell({ items, unread }: { items: ShellNotification[]; unrea
               );
             })}
           </ul>
-          <Link href="/panel/bildirimler" onClick={() => setOpen(false)} className="block border-t border-zinc-100 px-4 py-3 text-center text-sm font-semibold hover:bg-zinc-50">
+          <Link href="/panel/bildirimler" onClick={() => setOpen(false)} className="block px-5 py-3.5 text-center text-sm font-semibold hover:bg-white/70">
             Tüm bildirimler ve e-posta kayıtları
           </Link>
         </div>
@@ -151,14 +161,14 @@ function MerchantSwitcher({ merchants, current }: { merchants: { id: number; nam
   const [pending, start] = useTransition();
   if (!merchants.length) return null;
   return (
-    <label className="inline-flex max-w-full min-w-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white py-1 pl-3 pr-1 text-sm">
-      <Building2 size={16} className="shrink-0 text-zinc-400" />
-      <span className="hidden shrink-0 text-xs text-zinc-500 md:inline">Satıcı:</span>
+    <label className="relative block rounded-2xl border border-black/10 bg-white/70 px-4 py-3">
+      <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">Satıcı adına yönet</span>
       <select
         value={current ?? merchants[0].id}
         disabled={pending}
         onChange={(e) => start(() => switchMerchant(Number(e.target.value)))}
-        className="h-8 min-w-0 max-w-[180px] truncate bg-transparent pr-1 font-semibold outline-none md:max-w-[240px]"
+        className="mt-0.5 w-full appearance-none pr-6 text-[15px] font-semibold outline-none"
+        style={{ backgroundColor: "transparent" }}
         aria-label="İşlem yapılan satıcı"
       >
         {merchants.map((m) => (
@@ -167,192 +177,259 @@ function MerchantSwitcher({ merchants, current }: { merchants: { id: number; nam
           </option>
         ))}
       </select>
+      <ChevronDown size={16} className="pointer-events-none absolute bottom-4 right-4 text-zinc-400" />
     </label>
   );
 }
 
-function UserMenu({ name, email, logout }: { name: string; email: string; logout: () => Promise<void> }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useOutside(ref, () => setOpen(false), open);
+function ProfileSheet({ open, onClose, props, groups }: { open: boolean; onClose: () => void; props: ShellProps; groups: { title?: string; list: SheetItem[] }[] }) {
+  useEffect(() => {
+    if (!open) return;
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", esc);
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", esc);
+      document.documentElement.style.overflow = "";
+    };
+  }, [open, onClose]);
   return (
-    <div ref={ref} className="relative">
-      <button type="button" onClick={() => setOpen(!open)} className="flex h-10 items-center gap-2 rounded-lg px-2 hover:bg-zinc-100">
-        <span className="grid h-8 w-8 place-items-center rounded-full bg-zinc-900 text-xs font-bold text-white">{name.slice(0, 1).toUpperCase()}</span>
-        <span className="hidden max-w-[140px] truncate text-sm font-medium md:block">{name}</span>
-        <ChevronDown size={15} className="hidden text-zinc-400 md:block" />
-      </button>
-      {open && (
-        <div className="absolute right-0 top-12 z-50 w-60 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-2xl">
-          <div className="border-b border-zinc-100 px-4 py-3">
-            <p className="truncate text-sm font-semibold">{name}</p>
-            <p className="truncate text-xs text-zinc-500">{email}</p>
+    <>
+      <div className={clsx("fixed inset-0 z-[60] bg-zinc-900/10 backdrop-blur-[2px] transition-opacity", open ? "opacity-100" : "pointer-events-none opacity-0")} onClick={onClose} aria-hidden />
+      <aside
+        className={clsx(
+          "glass-strong fixed inset-y-0 right-0 z-[61] flex w-full max-w-[420px] flex-col transition-transform duration-300 ease-out sm:rounded-l-[28px]",
+          open ? "translate-x-0" : "invisible translate-x-full",
+        )}
+        aria-hidden={!open}
+        aria-label="Hesap menüsü"
+      >
+        <div className="flex items-center gap-3 border-b border-black/5 px-6 py-5">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-black/10 bg-white">
+            <CircleUser size={22} strokeWidth={1.5} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-semibold">{props.userName}</p>
+            <p className="truncate text-sm text-zinc-500">{props.userEmail}</p>
           </div>
-          <Link href="/panel/hesap" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-zinc-50">
-            <CircleUser size={16} /> Hesabım
-          </Link>
-          <Link href="/panel/bildirimler" onClick={() => setOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-zinc-50">
-            <Bell size={16} /> Bildirimler
-          </Link>
-          <form action={logout}>
-            <button type="submit" className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50">
-              <LogOut size={16} /> Çıkış yap
+          <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/5" aria-label="Kapat">
+            <X size={18} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+          <div className="px-2">
+            {props.isPlatform ? (
+              <MerchantSwitcher merchants={props.merchants} current={props.currentMerchantId} />
+            ) : (
+              <Link href="/panel/hesap" onClick={onClose} className="flex items-center gap-3 rounded-2xl border border-black/10 bg-white/70 px-4 py-3">
+                <span className="orb h-9 w-9 shrink-0" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">Mağaza</span>
+                  <span className="block truncate text-[15px] font-semibold">{props.accountName}</span>
+                  <span className="block text-xs text-zinc-500">{props.planName}</span>
+                </span>
+              </Link>
+            )}
+          </div>
+          {groups.map((g, gi) => (
+            <div key={gi} className="mt-4">
+              {g.title && <p className="px-4 pb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">{g.title}</p>}
+              <ul className="divide-y divide-black/5">
+                {g.list.map(({ href, label, desc, icon: I, badge }) => (
+                  <li key={href + label}>
+                    <Link href={href} onClick={onClose} className="flex items-start gap-4 rounded-2xl px-4 py-3.5 hover:bg-white/80">
+                      <I size={19} strokeWidth={1.6} className="mt-0.5 shrink-0 text-zinc-700" />
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2 font-semibold">
+                          {label}
+                          {badge ? <span className="rounded-full bg-zinc-900 px-1.5 py-0.5 text-[10px] font-bold text-white">{badge > 99 ? "99+" : badge}</span> : null}
+                        </span>
+                        <span className="block text-sm text-zinc-500">{desc}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-black/5 p-5">
+          <form action={props.logout}>
+            <button type="submit" className="flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-zinc-900 font-semibold transition-colors hover:bg-zinc-900 hover:text-white">
+              <LogOut size={17} /> Çıkış yap
             </button>
           </form>
         </div>
-      )}
-    </div>
+      </aside>
+    </>
+  );
+}
+
+function BottomItem({ href, label, icon: I, badge, active }: { href: string; label: string; icon: Icon; badge?: number; active: boolean }) {
+  return (
+    <li>
+      <Link href={href} className={clsx("relative flex flex-col items-center gap-1 py-2 text-[11px] font-medium", active ? "text-zinc-900" : "text-zinc-500")}>
+        <I size={21} strokeWidth={active ? 2.2 : 1.7} />
+        {label}
+        {badge ? <span className="absolute right-[22%] top-1 grid h-4 min-w-4 place-items-center rounded-full bg-zinc-900 px-1 text-[9px] font-bold text-white">{badge > 99 ? "99+" : badge}</span> : null}
+      </Link>
+    </li>
   );
 }
 
 export function PanelShell(props: ShellProps) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [sheet, setSheet] = useState(false);
   const { counts } = props;
-  const merchantName = props.merchants.find((m) => m.id === props.currentMerchantId)?.name ?? props.merchants[0]?.name ?? "";
+  const firstName = props.userName.split(" ")[0];
 
-  const merchantItems: Item[] = [
-    { href: "/panel/urunler", label: "Ürünler", icon: Package },
-    { href: "/panel/katalog", label: "Katalogdan Ekle", icon: Library },
-    { href: "/panel/kuponlar", label: "Kuponlar", icon: Ticket },
-    { href: "/panel/shopier", label: "Shopier Bağlantısı", icon: Plug },
-    { href: "/panel/temalar", label: "Temalar", icon: Palette },
-  ];
+  const tabs: Tab[] = props.isPlatform
+    ? [
+        { href: "/panel", label: "Özet" },
+        { href: "/panel/ozellestir", label: "Özelleştir" },
+        { href: "/panel/saticilar", label: "Satıcılar" },
+        { href: "/panel/siteler", label: "Siteler" },
+        { href: "/panel/siparisler", label: "Siparişler", badge: counts.pendingOrders },
+        { href: "/panel/musteriler", label: "Müşteriler" },
+        { href: "/panel/urunler", label: "Ürünler" },
+        { href: "/panel/havuz", label: "Havuz" },
+      ]
+    : [
+        { href: "/panel", label: "Özet" },
+        { href: "/panel/ozellestir", label: "Özelleştir" },
+        { href: "/panel/siteler", label: "Sitelerim" },
+        { href: "/panel/urunler", label: "Ürünler" },
+        { href: "/panel/katalog", label: "Katalog" },
+        { href: "/panel/siparisler", label: "Siparişler", badge: counts.pendingOrders },
+        { href: "/panel/musteriler", label: "Müşteriler" },
+      ];
 
-  const groups: Group[] = props.isPlatform
+  const groups: { title?: string; list: SheetItem[] }[] = props.isPlatform
     ? [
         {
           title: "Platform",
-          items: [
-            { href: "/panel", label: "Genel Bakış", icon: LayoutDashboard },
-            { href: "/panel/saticilar", label: "Satıcılar", icon: Building2 },
-            { href: "/panel/siteler", label: "Tüm Siteler", icon: Globe },
-            { href: "/panel/siparisler", label: "Tüm Siparişler", icon: Receipt, badge: counts.pendingOrders },
-            { href: "/panel/musteriler", label: "Müşteriler", icon: Users },
-            { href: "/panel/mesajlar", label: "Mesajlar", icon: MessageSquare, badge: counts.unreadMessages },
-            { href: "/panel/havuz", label: "Katalog Havuzu", icon: Library },
-            { href: "/panel/bildirimler", label: "Bildirim & E-posta", icon: Mail, badge: counts.unreadNotifications },
-            { href: "/panel/platform-ayarlari", label: "Platform Ayarları", icon: Settings },
+          list: [
+            { href: "/panel/platform-ayarlari", label: "Yönetim paneli", desc: "Genel ayarlar, SMTP, yapay zeka ve ödemeler", icon: ShieldCheck },
+            { href: "/panel/saticilar", label: "Satıcılar", desc: "Paketler, limitler, faturalar", icon: Building2 },
+            { href: "/panel/mesajlar", label: "Mesajlar", desc: "İletişim formu, bülten ve stok talepleri", icon: MessageSquare, badge: counts.unreadMessages },
+            { href: "/panel/bildirimler", label: "Bildirimler", desc: "Bildirimler ve e-posta kayıtları", icon: Mail, badge: counts.unreadNotifications },
           ],
         },
-        { title: `Satıcı adına: ${merchantName}`, items: [...merchantItems, { href: "/panel/hesap", label: "Satıcı Hesabı", icon: CircleUser }] },
+        {
+          title: "Seçili satıcı adına",
+          list: [
+            { href: "/panel/katalog", label: "Katalogdan ekle", desc: "Havuzdan hazır ürün seç", icon: Library },
+            { href: "/panel/temalar", label: "Temalar", desc: "10 mağaza tasarımı", icon: Palette },
+            { href: "/panel/kuponlar", label: "Kuponlar", desc: "İndirim kodları", icon: Ticket },
+            { href: "/panel/shopier", label: "Shopier bağlantısı", desc: "Ödeme, ürün ve sipariş senkronu", icon: Plug },
+            { href: "/panel/hesap", label: "Satıcı hesabı", desc: "Paket, firma bilgileri, ekip", icon: Settings },
+          ],
+        },
       ]
     : [
         {
-          title: "Mağaza",
-          items: [
-            { href: "/panel", label: "Genel Bakış", icon: LayoutDashboard },
-            { href: "/panel/siteler", label: "Sitelerim", icon: Globe },
-            { href: "/panel/siparisler", label: "Siparişler", icon: Receipt, badge: counts.pendingOrders },
-            { href: "/panel/urunler", label: "Ürünlerim", icon: Package },
-            { href: "/panel/katalog", label: "Katalog Havuzu", icon: Library },
-            { href: "/panel/musteriler", label: "Müşteriler", icon: Users },
-            { href: "/panel/kuponlar", label: "Kuponlar", icon: Ticket },
-            { href: "/panel/mesajlar", label: "Mesajlar", icon: MessageSquare, badge: counts.unreadMessages },
-          ],
-        },
-        {
-          title: "Ayarlar",
-          items: [
-            { href: "/panel/shopier", label: "Shopier Bağlantısı", icon: Plug },
-            { href: "/panel/temalar", label: "Temalar", icon: Palette },
-            { href: "/panel/bildirimler", label: "Bildirimler", icon: Bell, badge: counts.unreadNotifications },
-            { href: "/panel/hesap", label: "Hesap ve Paket", icon: Settings },
+          list: [
+            { href: "/panel/hesap", label: "Ayarlar", desc: "Hesap, güvenlik, paket ve faturalar", icon: Settings },
+            { href: "/panel/temalar", label: "Temalar", desc: "10 mağaza tasarımı, önizle ve uygula", icon: Palette },
+            { href: "/panel/shopier", label: "Shopier bağlantısı", desc: "Ödeme, ürün ve sipariş senkronu", icon: Plug },
+            { href: "/panel/kuponlar", label: "Kuponlar", desc: "İndirim kodları ve kampanyalar", icon: Ticket },
+            { href: "/panel/mesajlar", label: "Mesajlar", desc: "İletişim formu, bülten ve stok talepleri", icon: MessageSquare, badge: counts.unreadMessages },
+            { href: "/panel/hesap?sekme=ekip", label: "Ekip", desc: "Ekip üyeleri ve yetkiler", icon: Users },
+            { href: "/panel/siteler", label: "Alan adları", desc: "Sitelerin kendi alan adında açılsın", icon: Globe },
+            { href: "/panel/bildirimler", label: "Bildirimler", desc: "Bildirim tercihleri ve e-posta kayıtları", icon: Bell, badge: counts.unreadNotifications },
           ],
         },
       ];
 
-  const active = (href: string) => (href === "/panel" ? pathname === "/panel" : pathname === href || pathname.startsWith(`${href}/`));
+  const isActive = (href: string) => (href === "/panel" ? pathname === "/panel" : pathname === href || pathname.startsWith(`${href}/`));
 
-  useEffect(() => {
-    document.documentElement.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.documentElement.style.overflow = "";
-    };
-  }, [open]);
-
-  const sidebar = (
-    <div className="flex h-full flex-col">
-      <div className="flex h-16 items-center justify-between px-5">
-        <Link href="/panel" className="text-lg font-black tracking-tight text-white">
-          SNEAKER<span className="text-orange-500">OS</span>
-        </Link>
-        <button type="button" className="text-zinc-400 lg:hidden" onClick={() => setOpen(false)} aria-label="Menüyü kapat">
-          <X size={20} />
-        </button>
-      </div>
-      <div className="mx-4 mb-4 rounded-lg bg-white/5 px-3 py-2.5">
-        <p className="truncate text-sm font-semibold text-white">{props.accountName}</p>
-        <p className="text-xs text-zinc-400">{props.planName}</p>
-      </div>
-      <nav className="flex-1 space-y-6 overflow-y-auto px-3 pb-6">
-        {groups.map((g) => (
-          <div key={g.title}>
-            <p className="truncate px-2 pb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">{g.title}</p>
-            <ul className="space-y-0.5">
-              {g.items.map(({ href, label, icon: Icon, badge }) => (
-                <li key={href + label}>
-                  <Link
-                    href={href}
-                    onClick={() => setOpen(false)}
-                    className={clsx(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                      active(href) ? "bg-white font-semibold text-zinc-900" : "text-zinc-300 hover:bg-white/10 hover:text-white",
-                    )}
-                  >
-                    <Icon size={17} />
-                    <span className="flex-1 truncate">{label}</span>
-                    {badge ? <span className={clsx("rounded-full px-1.5 py-0.5 text-[10px] font-bold", active(href) ? "bg-zinc-900 text-white" : "bg-orange-500 text-white")}>{badge > 99 ? "99+" : badge}</span> : null}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </nav>
-      <div className="border-t border-white/10 p-4">
-        <a href="https://www.shopier.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-zinc-400 hover:text-white">
-          <ShoppingBag size={14} /> Shopier paneline git
-        </a>
-      </div>
-    </div>
-  );
+  const bottom: { href: string; label: string; icon: Icon; badge?: number }[] = [
+    { href: "/panel", label: "Özet", icon: LayoutGrid },
+    props.isPlatform ? { href: "/panel/saticilar", label: "Satıcılar", icon: Building2 } : { href: "/panel/urunler", label: "Ürünler", icon: Package },
+    { href: "/panel/siparisler", label: "Siparişler", icon: Receipt, badge: counts.pendingOrders },
+  ];
 
   return (
-    <div className="panel-root min-h-screen bg-zinc-50 font-sans text-zinc-900 lg:grid lg:grid-cols-[256px_1fr]">
-      <aside className="sticky top-0 hidden h-screen bg-zinc-950 lg:block">{sidebar}</aside>
-      <div
-        className={clsx("fixed inset-0 z-50 bg-black/50 transition-opacity lg:hidden", open ? "opacity-100" : "pointer-events-none opacity-0")}
-        onClick={() => setOpen(false)}
-        aria-hidden
-      />
-      <aside className={clsx("fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-zinc-950 transition-transform lg:hidden", open ? "translate-x-0" : "invisible -translate-x-full")} aria-hidden={!open}>
-        {sidebar}
-      </aside>
-
-      <div className="min-w-0">
-        <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/90 backdrop-blur">
-          <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-2 px-3 md:px-8">
-            <button type="button" onClick={() => setOpen(true)} aria-label="Menüyü aç" className="grid h-10 w-10 place-items-center rounded-lg hover:bg-zinc-100 lg:hidden">
-              <Menu size={22} />
-            </button>
-            <Link href="/panel" className="font-black tracking-tight lg:hidden">
-              S<span className="text-orange-500">OS</span>
-            </Link>
-            <div className="ml-1 min-w-0 flex-1 lg:ml-0">
-              {props.isPlatform ? <MerchantSwitcher merchants={props.merchants} current={props.currentMerchantId} /> : <p className="hidden truncate text-sm text-zinc-500 md:block">{props.accountName}</p>}
-            </div>
-            <NotificationBell items={props.notifications} unread={counts.unreadNotifications} />
-            <UserMenu name={props.userName} email={props.userEmail} logout={props.logout} />
-          </div>
-        </header>
-        {props.alert && (
-          <Link href={props.alert.href} className={clsx("block px-4 py-2.5 text-center text-sm font-medium md:px-8", props.alert.tone === "red" ? "bg-rose-600 text-white" : "bg-amber-100 text-amber-900")}>
-            {props.alert.text} <span className="underline">Paketini seç →</span>
+    <div className="panel-root min-h-screen">
+      <header className="sticky top-0 z-40 border-b border-white/60 bg-white/55 backdrop-blur-2xl backdrop-saturate-150">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-3 px-4 md:px-8">
+          <Link href="/panel" className="shrink-0 text-[22px]">
+            <Wordmark />
           </Link>
-        )}
-        <main className="mx-auto w-full max-w-[1400px] px-4 py-6 md:px-8 md:py-8">{props.children}</main>
-      </div>
+          <nav className="no-scrollbar ml-4 hidden min-w-0 flex-1 overflow-x-auto lg:block" aria-label="Panel">
+            <ul className="flex h-16 items-stretch gap-1">
+              {tabs.map((t) => {
+                const on = isActive(t.href);
+                return (
+                  <li key={t.href}>
+                    <Link
+                      href={t.href}
+                      aria-current={on ? "page" : undefined}
+                      className={clsx("relative flex h-full items-center gap-1.5 whitespace-nowrap px-3 text-[15px] transition-colors", on ? "font-semibold text-zinc-900" : "text-zinc-500 hover:text-zinc-900")}
+                    >
+                      {t.label}
+                      {t.badge ? <span className="rounded-full bg-zinc-900 px-1.5 py-0.5 text-[10px] font-bold text-white">{t.badge > 99 ? "99+" : t.badge}</span> : null}
+                      {on && (
+                        <svg className="absolute -bottom-px left-1/2 -translate-x-1/2" width="30" height="10" viewBox="0 0 30 10" aria-hidden>
+                          <path d="M0 10 L15 1 L30 10" fill="#f6f7f9" stroke="rgba(15,17,26,0.14)" strokeWidth="1" />
+                        </svg>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            <NotificationBell items={props.notifications} unread={counts.unreadNotifications} />
+            <button type="button" onClick={() => setSheet(true)} className="flex items-center gap-3 rounded-full p-1 hover:bg-white/60 md:pl-3" aria-label="Hesap menüsü">
+              <span className="hidden text-right leading-tight md:block">
+                <span className="block text-sm font-semibold">Merhaba, {firstName}</span>
+                <span className="block max-w-[220px] truncate text-xs text-zinc-500">
+                  {props.accountName} · {props.isPlatform ? "Süper admin" : "Sahip"}
+                </span>
+              </span>
+              <span className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white/80">
+                <CircleUser size={19} strokeWidth={1.6} />
+              </span>
+              <ChevronDown size={16} className="hidden text-zinc-500 md:block" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {props.alert && (
+        <div className="mx-auto max-w-[1440px] px-4 pt-4 md:px-8">
+          <Link href={props.alert.href} className={clsx("glass flex flex-wrap items-center justify-between gap-2 rounded-2xl px-5 py-3 text-sm", props.alert.tone === "red" ? "text-rose-700" : "text-amber-800")}>
+            <span className="font-medium">{props.alert.text}</span>
+            <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white">Paketini seç</span>
+          </Link>
+        </div>
+      )}
+
+      <main className="mx-auto w-full max-w-[1440px] px-4 pb-32 pt-6 md:px-8 md:pt-8 lg:pb-12">{props.children}</main>
+
+      {/* Mobil: uygulama hissiyatında alt sekme çubuğu, ortada yapay zeka küresi */}
+      <nav className="fixed inset-x-3 bottom-3 z-40 lg:hidden" aria-label="Hızlı menü" style={{ marginBottom: "env(safe-area-inset-bottom)" }}>
+        <ul className="glass-strong grid h-[68px] grid-cols-5 items-center rounded-[26px] px-1">
+          <BottomItem {...bottom[0]} active={isActive(bottom[0].href)} />
+          <BottomItem {...bottom[1]} active={isActive(bottom[1].href)} />
+          <li className="grid place-items-center">
+            <Link href="/panel/ozellestir" aria-label="Yapay zeka ile yönet" className="orb-halo relative -mt-8 grid place-items-center">
+              <span className={clsx("orb block h-14 w-14", isActive("/panel/ozellestir") && "ring-4 ring-white")} />
+            </Link>
+          </li>
+          <BottomItem {...bottom[2]} active={isActive(bottom[2].href)} />
+          <li>
+            <button type="button" onClick={() => setSheet(true)} className="flex w-full flex-col items-center gap-1 py-2 text-[11px] font-medium text-zinc-500">
+              <Menu size={21} strokeWidth={1.7} />
+              Menü
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <ProfileSheet open={sheet} onClose={() => setSheet(false)} props={props} groups={groups} />
     </div>
   );
 }

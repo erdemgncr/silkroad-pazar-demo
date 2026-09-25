@@ -36,7 +36,7 @@ export default async function CouponsPage({ searchParams }: PageProps<"/panel/ku
               {coupons.map((c) => {
                 const st = state(c);
                 return (
-                  <div key={c.id} className="flex flex-col rounded-xl border border-zinc-200 bg-white p-4">
+                  <div key={c.id} className="flex flex-col glass rounded-3xl p-4">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <p className="font-mono text-lg font-bold tracking-wide">{c.code}</p>
@@ -63,7 +63,7 @@ export default async function CouponsPage({ searchParams }: PageProps<"/panel/ku
                       </div>
                     )}
                     <div className="mt-4 flex gap-2">
-                      <Link href={`/panel/kuponlar?duzenle=${c.id}`} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-300 px-3 text-sm font-semibold hover:bg-zinc-50">
+                      <Link href={`/panel/kuponlar?duzenle=${c.id}`} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold hover:bg-white">
                         <Pencil size={14} /> Düzenle
                       </Link>
                       <ActionButton action={toggleCoupon.bind(null, c.id, !c.active)}>{c.active ? <Pause size={14} /> : <Play size={14} />}</ActionButton>

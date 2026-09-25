@@ -322,7 +322,7 @@ async function ProductSidebar({ productId, merchantId }: { productId: number; me
               const url = `${siteUrl(site.slug, domains.filter((d) => d.siteId === site.id))}/urun/${product.slug}`;
               const auto = productCopy(site, product, null);
               return (
-                <details key={site.id} className="group rounded-lg border border-zinc-200">
+                <details key={site.id} className="group rounded-lg border border-black/10">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5">
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-semibold">{site.name}</span>
@@ -331,11 +331,11 @@ async function ProductSidebar({ productId, merchantId }: { productId: number; me
                         {o?.aiGeneratedAt ? <Badge tone="violet">AI metni</Badge> : o && (o.title || o.description) ? <Badge tone="blue">Özel metin</Badge> : <Badge>Otomatik</Badge>}
                       </span>
                     </span>
-                    <a href={url} target="_blank" rel="noopener noreferrer" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-zinc-200 hover:bg-zinc-50" title="Sitede gör">
+                    <a href={url} target="_blank" rel="noopener noreferrer" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-black/10 hover:bg-white/60" title="Sitede gör">
                       <ArrowUpRight size={14} />
                     </a>
                   </summary>
-                  <div className="space-y-3 border-t border-zinc-100 p-3">
+                  <div className="space-y-3 border-t border-black/5 p-3">
                     <div className="flex flex-wrap gap-2">
                       <ActionButton action={aiForSite.bind(null, product.id, site.id)} variant="primary">
                         <Sparkles size={14} /> AI ile yaz
@@ -373,7 +373,7 @@ async function ProductSidebar({ productId, merchantId }: { productId: number; me
             {accounts.map((a) => {
               const l = links.find((x) => x.shopierAccountId === a.id);
               return (
-                <li key={a.id} className="space-y-2 rounded-lg border border-zinc-200 p-3">
+                <li key={a.id} className="space-y-2 rounded-lg border border-black/10 p-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="truncate text-sm font-semibold">{a.name}</span>
                     {l?.status === "synced" ? <Badge tone="green">Senkron</Badge> : l?.status === "error" ? <Badge tone="red">Hata</Badge> : <Badge>Gönderilmedi</Badge>}

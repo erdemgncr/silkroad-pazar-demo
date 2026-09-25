@@ -158,7 +158,7 @@ export async function bulkPrice(scope: Scope, ids: number[], percent: number) {
   if (!ids.length || !Number.isFinite(percent) || percent === 0 || Math.abs(percent) > 90) return { error: "Geçerli bir yüzde girin (-90 ile 90 arası)." };
   await db
     .update(schema.products)
-    .set({ price: sql`(round(${schema.products.price} * ${1 + percent / 100} / 1000) * 1000 - 100)::int`, updatedAt: new Date() })
+    .set({ price: sql`greatest(100, (round(${schema.products.price} * ${String(1 + percent / 100)}::numeric / 1000) * 1000 - 100))::int`, updatedAt: new Date() })
     .where(and(eq(schema.products.catalogKey, s.catalogKey), inArray(schema.products.id, ids)));
   invalidate(`catalog:${s.catalogKey}`);
   revalidatePath(s.base);

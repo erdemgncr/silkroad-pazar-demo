@@ -86,10 +86,10 @@ export default async function SiteEditPage({ params, searchParams }: PageProps<"
         description={`${url.replace(/^https?:\/\//, "")} · ${THEMES[site.theme].name} tema${ctx.isPlatform && merchant ? ` · ${merchant.name}` : ""}`}
         actions={
           <>
-            <a href={`/panel/onizle/${site.slug}`} className="inline-flex h-10 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 text-sm font-semibold hover:bg-zinc-50">
+            <a href={`/panel/onizle/${site.slug}`} className="inline-flex h-10 items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold hover:bg-white">
               <Eye size={16} /> Önizle
             </a>
-            <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex h-10 items-center gap-2 rounded-lg bg-zinc-900 px-4 text-sm font-semibold text-white">
+            <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex h-10 items-center gap-2 rounded-full bg-zinc-900 px-4 text-sm font-semibold text-white">
               Siteyi Aç <ArrowUpRight size={16} />
             </a>
           </>
@@ -166,7 +166,7 @@ async function GeneralTab({ site, isPlatform }: { site: SiteRow; isPlatform: boo
       </div>
       <div className="space-y-6">
         <Card title="Tema">
-          <div className="overflow-hidden rounded-lg border border-zinc-200">
+          <div className="overflow-hidden rounded-lg border border-black/10">
             <ThemeThumb theme={site.theme} colors={s.colors} />
           </div>
           <p className="mt-3 font-semibold">{THEMES[site.theme].name}</p>
@@ -414,7 +414,7 @@ async function SeoTab({ site, url, colKey }: { site: SiteRow; url: string; colKe
       <Card title="Kategori ve marka sayfası SEO" description="Seçtiğin sayfanın başlığını, açıklamasını ve alt metnini elle yazabilirsin. Boş alanlar otomatik üretilir.">
         <form className="mb-5 flex flex-col gap-2 sm:flex-row">
           <input type="hidden" name="sekme" value="seo" />
-          <select name="kategori" defaultValue={colKey} className="h-10 flex-1 rounded-lg border border-zinc-300 bg-white px-3 text-sm">
+          <select name="kategori" defaultValue={colKey} className="h-10 flex-1 rounded-xl border border-black/10 bg-white px-3 text-sm">
             <option value="">Sayfa seçin…</option>
             {cols.map((c) => (
               <option key={c.key} value={c.key}>
@@ -422,7 +422,7 @@ async function SeoTab({ site, url, colKey }: { site: SiteRow; url: string; colKe
               </option>
             ))}
           </select>
-          <button className="h-10 rounded-lg bg-zinc-900 px-4 text-sm font-semibold text-white">Düzenle</button>
+          <button className="h-10 rounded-full bg-zinc-900 px-4 text-sm font-semibold text-white">Düzenle</button>
         </form>
         {overrides.length > 0 && !selected && (
           <div className="flex flex-wrap gap-2">
@@ -465,7 +465,7 @@ async function DomainsTab({ site, domains }: { site: SiteRow; domains: (typeof s
     <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
       <div className="space-y-6">
         <Card title="Bağlı alan adları" description="Birincil alan adı dışındaki adresler (www dahil) birincil adrese 301 ile yönlendirilir; böylece Google'da kopya indeks oluşmaz.">
-          <ul className="divide-y divide-zinc-100">
+          <ul className="divide-y divide-black/5">
             <li className="flex flex-wrap items-center justify-between gap-3 py-3">
               <div className="flex min-w-0 items-center gap-2">
                 <Globe size={16} className="text-zinc-400" />
@@ -506,16 +506,16 @@ async function DomainsTab({ site, domains }: { site: SiteRow; domains: (typeof s
       </div>
       <Card title="DNS ayarları" description="Alan adı sağlayıcının (GoDaddy, Natro, İsimtescil, Cloudflare…) DNS panelinde şu kayıtları ekle:">
         <div className="space-y-3 text-sm">
-          <div className="overflow-x-auto rounded-lg border border-zinc-200">
+          <div className="overflow-x-auto rounded-lg border border-black/10">
             <table className="w-full text-left">
-              <thead className="bg-zinc-50 text-xs text-zinc-500">
+              <thead className="bg-white/40 text-xs text-zinc-500">
                 <tr>
                   <th className="px-3 py-2">Tür</th>
                   <th className="px-3 py-2">Ad</th>
                   <th className="px-3 py-2">Değer</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100 font-mono text-xs">
+              <tbody className="divide-y divide-black/5 font-mono text-xs">
                 <tr>
                   <td className="px-3 py-2">A</td>
                   <td className="px-3 py-2">@</td>
@@ -684,7 +684,7 @@ async function MailTab({ site, defaultTo }: { site: SiteRow; defaultTo: string }
         {logs.length === 0 ? (
           <p className="text-sm text-zinc-500">Bu siteden henüz e-posta gönderilmedi.</p>
         ) : (
-          <ul className="divide-y divide-zinc-100 text-sm">
+          <ul className="divide-y divide-black/5 text-sm">
             {logs.map((l) => (
               <li key={l.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
                 <div className="min-w-0">
@@ -749,7 +749,7 @@ async function PagesTab({ site, url, edit }: { site: SiteRow; url: string; edit:
       </Notice>
       {(Object.keys(groups) as (keyof typeof groups)[]).map((g) => (
         <Card key={g} title={groups[g]}>
-          <ul className="divide-y divide-zinc-100">
+          <ul className="divide-y divide-black/5">
             {STATIC_PAGES.filter((p) => p.group === g).map((p) => {
               const o = overrides.find((x) => x.slug === p.slug);
               return (
@@ -761,10 +761,10 @@ async function PagesTab({ site, url, edit }: { site: SiteRow; url: string; edit:
                     {o ? <Badge tone="blue">Düzenlendi</Badge> : <Badge>Otomatik</Badge>}
                   </div>
                   <div className="flex gap-2">
-                    <a href={`${url}/${p.slug}`} target="_blank" rel="noopener noreferrer" className="grid h-9 w-9 place-items-center rounded-lg border border-zinc-300 hover:bg-zinc-50" title="Görüntüle">
+                    <a href={`${url}/${p.slug}`} target="_blank" rel="noopener noreferrer" className="grid h-9 w-9 place-items-center rounded-full border border-black/10 bg-white/70 hover:bg-white" title="Görüntüle">
                       <ArrowUpRight size={15} />
                     </a>
-                    <Link href={`/panel/siteler/${site.id}?sekme=sayfalar&sayfa=${p.slug}`} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-300 px-3 text-sm font-semibold hover:bg-zinc-50">
+                    <Link href={`/panel/siteler/${site.id}?sekme=sayfalar&sayfa=${p.slug}`} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold hover:bg-white">
                       <Pencil size={14} /> Düzenle
                     </Link>
                   </div>
@@ -826,7 +826,7 @@ async function BlogTab({ site, url, edit }: { site: SiteRow; url: string; edit: 
       description="Blog, uzun kuyruklu Türkçe aramalarda trafik çekmenin en etkili yolu. Her site kendi yazılarıyla ayrı indekslenir."
       actions={<ButtonLink href={`/panel/siteler/${site.id}?sekme=blog&yazi=yeni`}>+ Yeni yazı</ButtonLink>}
     >
-      <ul className="divide-y divide-zinc-100">
+      <ul className="divide-y divide-black/5">
         {posts.map((p) => (
           <li key={p.id} className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center">
             <div className="h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
@@ -841,10 +841,10 @@ async function BlogTab({ site, url, edit }: { site: SiteRow; url: string; edit: 
             </div>
             <div className="flex items-center gap-2">
               <Badge tone={p.status === "published" ? "green" : "amber"}>{p.status === "published" ? "Yayında" : "Taslak"}</Badge>
-              <a href={`${url}/blog/${p.slug}`} target="_blank" rel="noopener noreferrer" className="grid h-9 w-9 place-items-center rounded-lg border border-zinc-300 hover:bg-zinc-50" title="Görüntüle">
+              <a href={`${url}/blog/${p.slug}`} target="_blank" rel="noopener noreferrer" className="grid h-9 w-9 place-items-center rounded-full border border-black/10 bg-white/70 hover:bg-white" title="Görüntüle">
                 <ArrowUpRight size={15} />
               </a>
-              <Link href={`/panel/siteler/${site.id}?sekme=blog&yazi=${p.id}`} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-300 px-3 text-sm font-semibold hover:bg-zinc-50">
+              <Link href={`/panel/siteler/${site.id}?sekme=blog&yazi=${p.id}`} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold hover:bg-white">
                 <Pencil size={14} /> Düzenle
               </Link>
               <ActionButton action={deleteBlogPost.bind(null, site.id, p.id)} variant="danger" confirm="Yazı silinsin mi?">

@@ -69,9 +69,9 @@ export default async function CustomersPage({ searchParams }: PageProps<"/panel/
       {rows.length === 0 ? (
         <Empty title="Müşteri bulunamadı" />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div className="overflow-hidden glass rounded-3xl">
           <table className="w-full text-sm">
-            <thead className="hidden bg-zinc-50 text-left text-xs text-zinc-500 md:table-header-group">
+            <thead className="hidden bg-white/40 text-left text-xs text-zinc-500 md:table-header-group">
               <tr>
                 <th className="px-4 py-3 font-medium">Müşteri</th>
                 <th className="px-4 py-3 font-medium">Site</th>
@@ -80,9 +80,9 @@ export default async function CustomersPage({ searchParams }: PageProps<"/panel/
                 <th className="hidden px-4 py-3 font-medium lg:table-cell">Üyelik</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-black/5">
               {rows.map(({ c, orders, spent }) => (
-                <tr key={c.id} className="hover:bg-zinc-50">
+                <tr key={c.id} className="hover:bg-white/60">
                   <td className="px-4 py-3">
                     <Link href={`/panel/musteriler/${c.id}`} className="flex items-center gap-3">
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-zinc-900 text-sm font-bold text-white">

@@ -137,3 +137,10 @@ export async function testGemini(key: string, model: string) {
   const out = (await callGemini(key, model, 'Sadece {"ok": true} döndür.', { type: "OBJECT", properties: { ok: { type: "BOOLEAN" } }, required: ["ok"] })) as { ok?: boolean };
   return Boolean(out.ok);
 }
+
+/** Serbest istem için yapılandırılmış (JSON şemalı) Gemini yanıtı. Anahtar yoksa null döner. */
+export async function aiJson(merchant: Merchant | null, prompt: string, schemaDef: object): Promise<unknown | null> {
+  const cfg = await aiConfig(merchant);
+  if (!cfg.key) return null;
+  return callGemini(cfg.key, cfg.model, prompt, schemaDef);
+}

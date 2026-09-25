@@ -78,7 +78,7 @@ export default async function InvoicePage({ params, searchParams }: PageProps<"/
             <p className="mt-1 text-sm text-zinc-500">KDV dahil · {inv.months} ay</p>
             <div className="mt-5 space-y-3">
               {shopierReady ? (
-                <a href={`/panel/abonelik/${inv.id}/ode`} className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 text-sm font-semibold text-white">
+                <a href={`/panel/abonelik/${inv.id}/ode`} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-zinc-900 text-sm font-semibold text-white">
                   <CreditCard size={17} /> Kartla öde (Shopier)
                 </a>
               ) : billing.mode === "demo" ? (
@@ -92,7 +92,7 @@ export default async function InvoicePage({ params, searchParams }: PageProps<"/
                 <Notice tone="amber">Kartla ödeme henüz yapılandırılmadı. Aşağıdaki banka bilgileriyle ödeme yapabilirsin.</Notice>
               )}
               {billing.bankInfo && (
-                <div className="rounded-lg bg-zinc-50 p-3 text-sm">
+                <div className="rounded-lg bg-white/40 p-3 text-sm">
                   <p className="font-semibold">Havale / EFT</p>
                   <p className="whitespace-pre-line text-zinc-600">{billing.bankInfo}</p>
                   <p className="mt-1 text-xs text-zinc-500">Açıklamaya {invoiceNo(inv.id)} yazın; ödeme onaylandığında paketin aktifleşir.</p>

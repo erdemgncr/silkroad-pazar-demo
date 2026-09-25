@@ -23,8 +23,8 @@ export default async function ThemesPage() {
           const t = THEMES[k];
           const using = sites.filter((s) => s.theme === k);
           return (
-            <article key={k} className="flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-              <div className="border-b border-zinc-100 bg-zinc-50 p-3">
+            <article key={k} className="flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white">
+              <div className="border-b border-black/5 bg-white/40 p-3">
                 <div className="overflow-hidden rounded-lg shadow-sm ring-1 ring-black/5">
                   <ThemeThumb theme={k} />
                 </div>

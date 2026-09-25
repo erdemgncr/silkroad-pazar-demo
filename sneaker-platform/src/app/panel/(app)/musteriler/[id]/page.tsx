@@ -52,7 +52,7 @@ export default async function CustomerPage({ params }: PageProps<"/panel/musteri
           {orders.length === 0 ? (
             <p className="text-sm text-zinc-500">Henüz sipariş yok.</p>
           ) : (
-            <ul className="divide-y divide-zinc-100">
+            <ul className="divide-y divide-black/5">
               {orders.map((o) => (
                 <li key={o.id} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
                   <Link href={`/panel/siparisler/${o.id}`} className="font-semibold hover:underline">
@@ -83,7 +83,7 @@ export default async function CustomerPage({ params }: PageProps<"/panel/musteri
             ) : (
               <ul className="space-y-3 text-sm">
                 {addresses.map((a) => (
-                  <li key={a.id} className="rounded-lg border border-zinc-200 p-3">
+                  <li key={a.id} className="rounded-lg border border-black/10 p-3">
                     <p className="font-semibold">{a.title}</p>
                     <p className="text-zinc-600">
                       {a.fullName} · {a.phone}

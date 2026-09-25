@@ -43,7 +43,7 @@ export function ActionForm({
     <form ref={ref} action={formAction} className={clsx("space-y-5", className)}>
       {children}
       {footer && (
-        <div className="flex flex-wrap items-center gap-3 border-t border-zinc-100 pt-4">
+        <div className="flex flex-wrap items-center gap-3 border-t border-black/5 pt-4">
           <button
             type="submit"
             disabled={pending}
@@ -110,7 +110,7 @@ export function TextArea({
   return (
     <label className={clsx("block", className)}>
       <span className={labelCls}>{label}</span>
-      <textarea name={name} rows={rows} className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-900" {...rest} />
+      <textarea name={name} rows={rows} className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-900" {...rest} />
       {kind && <input type="hidden" name={`$type.${name}`} value={kind} />}
       {hint && <span className="mt-1 block text-xs text-zinc-500">{hint}</span>}
     </label>
@@ -144,7 +144,7 @@ export function Select({
 export function Toggle({ label, name, defaultChecked, hint }: { label: string; name: string; defaultChecked?: boolean; hint?: string }) {
   const [on, setOn] = useState(Boolean(defaultChecked));
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-lg border border-zinc-200 p-3">
+    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-lg border border-black/10 p-3">
       <span>
         <span className="block text-sm font-medium">{label}</span>
         {hint && <span className="mt-0.5 block text-xs text-zinc-500">{hint}</span>}
@@ -164,7 +164,7 @@ export function ColorField({ label, name, defaultValue }: { label: string; name:
     <label className="block">
       <span className={labelCls}>{label}</span>
       <div className="flex items-center gap-2">
-        <input type="color" value={v} onChange={(e) => setV(e.target.value)} className="h-10 w-12 cursor-pointer rounded-lg border border-zinc-300 bg-white p-1" aria-label={label} />
+        <input type="color" value={v} onChange={(e) => setV(e.target.value)} className="h-10 w-12 cursor-pointer rounded-xl border border-black/10 bg-white p-1" aria-label={label} />
         <input name={name} value={v} onChange={(e) => setV(e.target.value)} className={inputCls} />
       </div>
     </label>
@@ -191,7 +191,7 @@ export function ImageField({ label, name, defaultValue, hint, value: controlled,
     <div>
       <span className={labelCls}>{label}</span>
       <div className="flex gap-3">
-        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
+        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-lg border border-black/10 bg-white/40">
           {value ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={value} alt="" className="h-full w-full object-cover" />
@@ -202,7 +202,7 @@ export function ImageField({ label, name, defaultValue, hint, value: controlled,
         <div className="min-w-0 flex-1 space-y-2">
           <input name={name} value={value} onChange={(e) => set(e.target.value)} placeholder="https://… ya da yükle" className={inputCls} />
           <div className="flex items-center gap-2">
-            <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 px-3 text-xs font-semibold hover:bg-zinc-50">
+            <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-4 text-xs font-semibold hover:bg-white">
               {busy ? <Loader2 size={13} className="animate-spin" /> : <ImagePlus size={13} />} Dosya yükle
               <input
                 type="file"
@@ -254,7 +254,7 @@ export function GalleryField({ name, defaultValue, max = 10 }: { name: string; d
       <input type="hidden" name={name} value={JSON.stringify(items)} />
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {items.map((im, i) => (
-          <div key={`${im.url}-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
+          <div key={`${im.url}-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-black/10 bg-white/40">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={im.url} alt="" className="h-full w-full object-cover" />
             {i === 0 && <span className="absolute left-1 top-1 rounded bg-zinc-900 px-1.5 py-0.5 text-[10px] font-semibold text-white">Kapak</span>}
@@ -274,7 +274,7 @@ export function GalleryField({ name, defaultValue, max = 10 }: { name: string; d
           </div>
         ))}
         {items.length < max && (
-          <label className="grid aspect-square cursor-pointer place-items-center rounded-lg border-2 border-dashed border-zinc-300 text-center text-xs text-zinc-500 hover:border-zinc-900">
+          <label className="grid aspect-square cursor-pointer place-items-center rounded-full border-2 border-dashed border-zinc-300 text-center text-xs text-zinc-500 hover:border-zinc-900">
             <span className="flex flex-col items-center gap-1">
               {busy ? <Loader2 size={18} className="animate-spin" /> : <ImagePlus size={18} />}
               Görsel yükle
@@ -311,7 +311,7 @@ export function GalleryField({ name, defaultValue, max = 10 }: { name: string; d
               setUrl("");
             }
           }}
-          className="inline-flex h-10 shrink-0 items-center gap-1 rounded-lg border border-zinc-300 px-3 text-sm font-semibold"
+          className="inline-flex h-10 shrink-0 items-center gap-1 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold"
         >
           <Plus size={15} /> Ekle
         </button>
@@ -333,19 +333,19 @@ export function Repeater({ name, fields, defaultValue, addLabel, max = 8, blank 
       <input type="hidden" name={name} value={JSON.stringify(items)} />
       <input type="hidden" name={`$type.${name}`} value="json" />
       {items.map((it, i) => (
-        <div key={i} className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+        <div key={i} className="rounded-xl border border-black/10 bg-white/40/60 p-4">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-semibold">
               {i + 1}. {it.title || "Yeni öğe"}
             </p>
             <div className="flex gap-1">
-              <button type="button" disabled={i === 0} onClick={() => setItems(items.map((x, j) => (j === i - 1 ? items[i] : j === i ? items[i - 1] : x)))} className="grid h-8 w-8 place-items-center rounded-lg border border-zinc-300 bg-white disabled:opacity-30" aria-label="Yukarı">
+              <button type="button" disabled={i === 0} onClick={() => setItems(items.map((x, j) => (j === i - 1 ? items[i] : j === i ? items[i - 1] : x)))} className="grid h-8 w-8 place-items-center rounded-full border border-black/10 bg-white/70 disabled:opacity-30" aria-label="Yukarı">
                 <ArrowUp size={14} />
               </button>
-              <button type="button" disabled={i === items.length - 1} onClick={() => setItems(items.map((x, j) => (j === i + 1 ? items[i] : j === i ? items[i + 1] : x)))} className="grid h-8 w-8 place-items-center rounded-lg border border-zinc-300 bg-white disabled:opacity-30" aria-label="Aşağı">
+              <button type="button" disabled={i === items.length - 1} onClick={() => setItems(items.map((x, j) => (j === i + 1 ? items[i] : j === i ? items[i + 1] : x)))} className="grid h-8 w-8 place-items-center rounded-full border border-black/10 bg-white/70 disabled:opacity-30" aria-label="Aşağı">
                 <ArrowDown size={14} />
               </button>
-              <button type="button" onClick={() => setItems(items.filter((_, j) => j !== i))} className="grid h-8 w-8 place-items-center rounded-lg border border-zinc-300 bg-white text-rose-600" aria-label="Sil">
+              <button type="button" onClick={() => setItems(items.filter((_, j) => j !== i))} className="grid h-8 w-8 place-items-center rounded-full border border-black/10 bg-white/70 text-rose-600" aria-label="Sil">
                 <Trash2 size={14} />
               </button>
             </div>
@@ -360,14 +360,14 @@ export function Repeater({ name, fields, defaultValue, addLabel, max = 8, blank 
                 <label key={f.key} className="block">
                   <span className={labelCls}>{f.label}</span>
                   <div className="flex gap-2">
-                    <input type="color" value={it[f.key] || "#000000"} onChange={(e) => update(i, f.key, e.target.value)} className="h-10 w-12 rounded-lg border border-zinc-300 bg-white p-1" />
+                    <input type="color" value={it[f.key] || "#000000"} onChange={(e) => update(i, f.key, e.target.value)} className="h-10 w-12 rounded-xl border border-black/10 bg-white p-1" />
                     <input value={it[f.key] ?? ""} onChange={(e) => update(i, f.key, e.target.value)} className={inputCls} />
                   </div>
                 </label>
               ) : f.type === "textarea" ? (
                 <label key={f.key} className="block md:col-span-2">
                   <span className={labelCls}>{f.label}</span>
-                  <textarea value={it[f.key] ?? ""} onChange={(e) => update(i, f.key, e.target.value)} rows={2} className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-900" />
+                  <textarea value={it[f.key] ?? ""} onChange={(e) => update(i, f.key, e.target.value)} rows={2} className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-900" />
                 </label>
               ) : (
                 <label key={f.key} className={clsx("block", f.wide && "md:col-span-2")}>
@@ -380,7 +380,7 @@ export function Repeater({ name, fields, defaultValue, addLabel, max = 8, blank 
         </div>
       ))}
       {items.length < max && (
-        <button type="button" onClick={() => setItems([...items, { ...blank }])} className="inline-flex h-10 items-center gap-2 rounded-lg border border-dashed border-zinc-400 px-4 text-sm font-semibold hover:bg-zinc-50">
+        <button type="button" onClick={() => setItems([...items, { ...blank }])} className="inline-flex h-10 items-center gap-2 rounded-lg border border-dashed border-zinc-400 px-4 text-sm font-semibold hover:bg-white/60">
           <Plus size={16} /> {addLabel}
         </button>
       )}

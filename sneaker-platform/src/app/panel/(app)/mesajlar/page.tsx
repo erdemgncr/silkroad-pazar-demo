@@ -63,7 +63,7 @@ async function ContactList({ ids, siteName, open }: { ids: number[]; siteName: (
               </span>
             </Link>
             {isOpen && (
-              <div className="grid gap-5 border-t border-zinc-100 p-4 lg:grid-cols-2">
+              <div className="grid gap-5 border-t border-black/5 p-4 lg:grid-cols-2">
                 <div className="space-y-3 text-sm">
                   <p className="whitespace-pre-line leading-relaxed">{m.message}</p>
                   <ul className="space-y-1 text-zinc-600">
@@ -103,7 +103,7 @@ async function Subscribers({ ids, siteName }: { ids: number[]; siteName: (id: nu
       title={`Aboneler (${rows.length})`}
       description="İleti izni vererek bültene katılan ziyaretçiler. Toplu e-posta için CSV'yi e-posta pazarlama aracına aktarabilirsin."
       actions={
-        <a href="/api/panel/bulten" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-300 px-3 text-sm font-semibold hover:bg-zinc-50">
+        <a href="/api/panel/bulten" className="inline-flex h-9 items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold hover:bg-white">
           <Download size={14} /> CSV
         </a>
       }
@@ -111,7 +111,7 @@ async function Subscribers({ ids, siteName }: { ids: number[]; siteName: (id: nu
       {rows.length === 0 ? (
         <p className="text-sm text-zinc-500">Henüz abone yok.</p>
       ) : (
-        <ul className="divide-y divide-zinc-100 text-sm">
+        <ul className="divide-y divide-black/5 text-sm">
           {rows.map((r) => (
             <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
               <span className="min-w-0 truncate font-medium">{r.email}</span>
@@ -143,7 +143,7 @@ async function Alerts({ ids, siteName }: { ids: number[]; siteName: (id: number)
       {rows.length === 0 ? (
         <p className="text-sm text-zinc-500">Bekleyen talep yok.</p>
       ) : (
-        <ul className="divide-y divide-zinc-100 text-sm">
+        <ul className="divide-y divide-black/5 text-sm">
           {rows.map(({ a, title, pid, image }) => (
             <li key={a.id} className="flex flex-wrap items-center gap-3 py-2.5">
               <span className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-zinc-100">

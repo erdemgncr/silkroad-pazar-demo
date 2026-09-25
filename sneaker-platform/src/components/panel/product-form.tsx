@@ -51,16 +51,16 @@ function VariantEditor({ value, onChange }: { value: Variant[]; onChange: (v: Va
             key={label}
             type="button"
             onClick={() => onChange([...value, ...sizes.filter((s) => !value.some((v) => v.size === s)).map((s) => ({ size: s, stock: 0 }))])}
-            className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium hover:bg-zinc-50"
+            className="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium hover:bg-white/60"
           >
             + {label}
           </button>
         ))}
       </div>
       {value.length > 0 && (
-        <div className="overflow-hidden rounded-lg border border-zinc-200">
+        <div className="overflow-hidden rounded-lg border border-black/10">
           <table className="w-full text-sm">
-            <thead className="bg-zinc-50 text-left text-xs text-zinc-500">
+            <thead className="bg-white/40 text-left text-xs text-zinc-500">
               <tr>
                 <th className="px-3 py-2 font-medium">Beden</th>
                 <th className="px-3 py-2 font-medium">Stok</th>
@@ -68,11 +68,11 @@ function VariantEditor({ value, onChange }: { value: Variant[]; onChange: (v: Va
                 <th className="w-10" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-black/5">
               {value.map((v, i) => (
                 <tr key={`${v.size}-${i}`} className={clsx(v.stock < 1 && "bg-rose-50/40")}>
                   <td className="px-3 py-1.5">
-                    <input value={v.size} onChange={(e) => onChange(value.map((x, j) => (j === i ? { ...x, size: e.target.value } : x)))} className="h-9 w-20 rounded-md border border-zinc-200 px-2 font-medium" />
+                    <input value={v.size} onChange={(e) => onChange(value.map((x, j) => (j === i ? { ...x, size: e.target.value } : x)))} className="h-9 w-20 rounded-md border border-black/10 px-2 font-medium" />
                   </td>
                   <td className="px-3 py-1.5">
                     <input
@@ -80,11 +80,11 @@ function VariantEditor({ value, onChange }: { value: Variant[]; onChange: (v: Va
                       min={0}
                       value={v.stock}
                       onChange={(e) => onChange(value.map((x, j) => (j === i ? { ...x, stock: Math.max(0, Number(e.target.value) || 0) } : x)))}
-                      className="h-9 w-20 rounded-md border border-zinc-200 px-2 tabular-nums"
+                      className="h-9 w-20 rounded-md border border-black/10 px-2 tabular-nums"
                     />
                   </td>
                   <td className="hidden px-3 py-1.5 sm:table-cell">
-                    <input value={v.sku ?? ""} onChange={(e) => onChange(value.map((x, j) => (j === i ? { ...x, sku: e.target.value } : x)))} className="h-9 w-full rounded-md border border-zinc-200 px-2" placeholder="İsteğe bağlı" />
+                    <input value={v.sku ?? ""} onChange={(e) => onChange(value.map((x, j) => (j === i ? { ...x, sku: e.target.value } : x)))} className="h-9 w-full rounded-md border border-black/10 px-2" placeholder="İsteğe bağlı" />
                   </td>
                   <td className="px-2">
                     <button type="button" onClick={() => onChange(value.filter((_, j) => j !== i))} className="grid h-8 w-8 place-items-center rounded text-zinc-400 hover:text-rose-600" aria-label="Bedeni kaldır">
@@ -105,7 +105,7 @@ function VariantEditor({ value, onChange }: { value: Variant[]; onChange: (v: Va
             if (newSize.trim() && !value.some((v) => v.size === newSize.trim())) onChange([...value, { size: newSize.trim(), stock: 0 }]);
             setNewSize("");
           }}
-          className="inline-flex h-10 items-center gap-1 rounded-lg border border-zinc-300 px-3 text-sm font-semibold"
+          className="inline-flex h-10 items-center gap-1 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold"
         >
           <Plus size={15} /> Beden ekle
         </button>
@@ -179,13 +179,13 @@ export function ProductForm({
           <Field label="Renk adı" name="colorName" defaultValue={initial.colorName} placeholder="Beyaz/Siyah" />
           <label className="block">
             <span className={labelCls}>Renk kodu</span>
-            <input type="color" name="colorHex" defaultValue={initial.colorHex} className="h-10 w-full cursor-pointer rounded-lg border border-zinc-300 bg-white p-1" />
+            <input type="color" name="colorHex" defaultValue={initial.colorHex} className="h-10 w-full cursor-pointer rounded-xl border border-black/10 bg-white p-1" />
           </label>
           <Field label="Adres (slug)" name="slug" defaultValue={initial.slug} hint="Boş bırakılırsa üründen üretilir." />
         </div>
       </section>
 
-      <section className="space-y-4 border-t border-zinc-100 pt-5">
+      <section className="space-y-4 border-t border-black/5 pt-5">
         <h3 className="font-semibold">Fiyat</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Satış fiyatı (TL)" name="price" inputMode="decimal" defaultValue={initial.price} required placeholder="4799" />
@@ -193,17 +193,17 @@ export function ProductForm({
         </div>
       </section>
 
-      <section className="space-y-4 border-t border-zinc-100 pt-5">
+      <section className="space-y-4 border-t border-black/5 pt-5">
         <h3 className="font-semibold">Görseller</h3>
         <GalleryField name="images" defaultValue={initial.images} max={12} />
       </section>
 
-      <section className="space-y-4 border-t border-zinc-100 pt-5">
+      <section className="space-y-4 border-t border-black/5 pt-5">
         <h3 className="font-semibold">Bedenler ve stok</h3>
         <VariantEditor value={variants} onChange={setVariants} />
       </section>
 
-      <section className="space-y-3 border-t border-zinc-100 pt-5">
+      <section className="space-y-3 border-t border-black/5 pt-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-semibold">Açıklama</h3>
           {aiAction && (
@@ -229,7 +229,7 @@ export function ProductForm({
         <Field label="Etiketler" name="tags" defaultValue={initial.tags} hint="Virgülle ayırın (örn. retro, deri, günlük)." />
       </section>
 
-      <section className="space-y-3 border-t border-zinc-100 pt-5">
+      <section className="space-y-3 border-t border-black/5 pt-5">
         <h3 className="font-semibold">Görünürlük</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           <Toggle label="Satışta" name="active" defaultChecked={initial.active} hint="Kapalıysa hiçbir sitede görünmez." />

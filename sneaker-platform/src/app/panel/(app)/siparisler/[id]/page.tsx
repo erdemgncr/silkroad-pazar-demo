@@ -51,7 +51,7 @@ export default async function OrderPage({ params }: PageProps<"/panel/siparisler
         actions={
           <>
             <Badge tone={STATUS_BADGE[order.status].tone}>{ORDER_STATUS_LABEL[order.status]}</Badge>
-            <a href={`/panel/yazdir/siparis/${order.id}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold hover:bg-zinc-50">
+            <a href={`/panel/yazdir/siparis/${order.id}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold hover:bg-white">
               <Printer size={15} /> Yazdır / irsaliye
             </a>
           </>
@@ -78,7 +78,7 @@ export default async function OrderPage({ params }: PageProps<"/panel/siparisler
             </Card>
           )}
           <Card title={`Ürünler (${items.reduce((x, i) => x + i.quantity, 0)})`}>
-            <ul className="divide-y divide-zinc-100">
+            <ul className="divide-y divide-black/5">
               {items.map((it) => (
                 <li key={it.id} className="flex gap-3 py-3">
                   <span className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
@@ -101,7 +101,7 @@ export default async function OrderPage({ params }: PageProps<"/panel/siparisler
                 </li>
               ))}
             </ul>
-            <dl className="mt-3 space-y-1.5 border-t border-zinc-100 pt-3 text-sm">
+            <dl className="mt-3 space-y-1.5 border-t border-black/5 pt-3 text-sm">
               <div className="flex justify-between">
                 <dt className="text-zinc-500">Ara toplam</dt>
                 <dd className="tabular-nums">{formatPrice(order.subtotal)}</dd>
@@ -116,7 +116,7 @@ export default async function OrderPage({ params }: PageProps<"/panel/siparisler
                 <dt className="text-zinc-500">Kargo</dt>
                 <dd className="tabular-nums">{order.shippingFee ? formatPrice(order.shippingFee) : "Ücretsiz"}</dd>
               </div>
-              <div className="flex justify-between border-t border-zinc-100 pt-2 text-base font-bold">
+              <div className="flex justify-between border-t border-black/5 pt-2 text-base font-bold">
                 <dt>Toplam</dt>
                 <dd className="tabular-nums">{formatPrice(order.total)}</dd>
               </div>
@@ -137,7 +137,7 @@ export default async function OrderPage({ params }: PageProps<"/panel/siparisler
             {mails.length === 0 ? (
               <p className="text-sm text-zinc-500">Kayıt yok.</p>
             ) : (
-              <ul className="divide-y divide-zinc-100 text-sm">
+              <ul className="divide-y divide-black/5 text-sm">
                 {mails.map((m) => (
                   <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
                     <span className="min-w-0 truncate">{m.subject}</span>
@@ -192,7 +192,7 @@ export default async function OrderPage({ params }: PageProps<"/panel/siparisler
               </li>
             </ul>
             <div className="mt-4 flex flex-wrap gap-2">
-              <a href={`https://wa.me/${order.phone.replace(/\D/g, "").replace(/^0/, "90")}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center rounded-lg border border-zinc-300 px-3 text-sm font-semibold hover:bg-zinc-50">
+              <a href={`https://wa.me/${order.phone.replace(/\D/g, "").replace(/^0/, "90")}`} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold hover:bg-white">
                 WhatsApp
               </a>
               <ActionButton action={resendConfirmation.bind(null, order.id)}>Durum e-postası gönder</ActionButton>

@@ -5,8 +5,8 @@ export function PageHeader({ title, description, actions }: { title: string; des
   return (
     <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-        {description && <p className="mt-1 max-w-3xl text-sm text-zinc-500">{description}</p>}
+        <h1 className="text-[28px] font-semibold tracking-[-0.03em] md:text-[32px]">{title}</h1>
+        {description && <p className="mt-1.5 max-w-3xl text-[15px] text-zinc-500">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -15,26 +15,26 @@ export function PageHeader({ title, description, actions }: { title: string; des
 
 export function Card({ children, className, title, description, actions }: { children: React.ReactNode; className?: string; title?: string; description?: string; actions?: React.ReactNode }) {
   return (
-    <section className={clsx("rounded-xl border border-zinc-200 bg-white", className)}>
+    <section className={clsx("glass rounded-3xl", className)}>
       {(title || actions) && (
-        <div className="flex items-start justify-between gap-4 border-b border-zinc-100 px-5 py-4">
+        <div className="flex items-start justify-between gap-4 border-b border-black/5 px-6 py-5">
           <div>
-            {title && <h2 className="font-semibold">{title}</h2>}
+            {title && <h2 className="text-[17px] font-semibold tracking-tight">{title}</h2>}
             {description && <p className="mt-0.5 text-sm text-zinc-500">{description}</p>}
           </div>
           {actions}
         </div>
       )}
-      <div className="p-5">{children}</div>
+      <div className="p-6">{children}</div>
     </section>
   );
 }
 
 export function Stat({ label, value, hint }: { label: string; value: React.ReactNode; hint?: string }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5">
+    <div className="glass rounded-3xl p-5">
       <p className="text-sm text-zinc-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold tabular-nums">{value}</p>
+      <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
       {hint && <p className="mt-1 text-xs text-zinc-400">{hint}</p>}
     </div>
   );
@@ -58,8 +58,8 @@ export function ButtonLink({ href, children, variant = "primary", className, tar
       href={href}
       target={target}
       className={clsx(
-        "inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors",
-        variant === "primary" ? "bg-zinc-900 text-white hover:bg-zinc-800" : "border border-zinc-300 bg-white hover:bg-zinc-50",
+        "inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold transition-colors",
+        variant === "primary" ? "bg-zinc-900 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)] hover:bg-zinc-800" : "border-[1.5px] border-zinc-900 bg-white/60 hover:bg-white",
         className,
       )}
     >
@@ -68,14 +68,15 @@ export function ButtonLink({ href, children, variant = "primary", className, tar
   );
 }
 
-export const inputCls = "h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-900";
+export const inputCls = "h-11 w-full rounded-xl border border-black/10 bg-white/80 px-3.5 text-sm outline-none transition focus:border-zinc-900 focus:bg-white focus:ring-4 focus:ring-zinc-900/5";
 export const labelCls = "mb-1.5 block text-sm font-medium text-zinc-700";
-export const btnCls = "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-50";
-export const btnSecondaryCls = "inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 text-sm font-semibold hover:bg-zinc-50 disabled:opacity-50";
+export const btnCls = "inline-flex h-11 items-center justify-center gap-2 rounded-full bg-zinc-900 px-5 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)] hover:bg-zinc-800 disabled:opacity-50";
+export const btnSecondaryCls = "inline-flex h-11 items-center justify-center gap-2 rounded-full border-[1.5px] border-zinc-900 bg-white/60 px-5 text-sm font-semibold hover:bg-white disabled:opacity-50";
 
 export function Empty({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-300 bg-white px-6 py-14 text-center">
+    <div className="glass flex flex-col items-center justify-center gap-2 rounded-3xl px-6 py-16 text-center">
+      <span className="orb mb-2 h-12 w-12" />
       <p className="font-semibold">{title}</p>
       {description && <p className="max-w-md text-sm text-zinc-500">{description}</p>}
       {action && <div className="mt-3">{action}</div>}
@@ -86,20 +87,20 @@ export function Empty({ title, description, action }: { title: string; descripti
 /** Sekme gezinmesi (?sekme= parametresiyle). Mobilde yatay kaydırılır. */
 export function TabNav({ tabs, active, base }: { tabs: { key: string; label: string; badge?: number | string }[]; active: string; base: string }) {
   return (
-    <div className="no-scrollbar -mx-4 mb-6 overflow-x-auto border-b border-zinc-200 px-4 md:mx-0 md:px-0">
-      <nav className="flex min-w-max gap-1">
+    <div className="no-scrollbar -mx-4 mb-6 overflow-x-auto px-4 md:mx-0 md:px-0">
+      <nav className="glass inline-flex min-w-max gap-1 rounded-full p-1">
         {tabs.map((t) => (
           <Link
             key={t.key}
             href={`${base}${base.includes("?") ? "&" : "?"}sekme=${t.key}`}
             scroll={false}
             className={clsx(
-              "relative flex items-center gap-1.5 whitespace-nowrap px-3 py-3 text-sm font-medium transition-colors",
-              active === t.key ? "text-zinc-900 after:absolute after:inset-x-2 after:-bottom-px after:h-0.5 after:bg-zinc-900" : "text-zinc-500 hover:text-zinc-900",
+              "flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors",
+              active === t.key ? "bg-zinc-900 text-white shadow-sm" : "text-zinc-600 hover:bg-white/80 hover:text-zinc-900",
             )}
           >
             {t.label}
-            {t.badge !== undefined && t.badge !== 0 && <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-bold text-zinc-600">{t.badge}</span>}
+            {t.badge !== undefined && t.badge !== 0 && <span className={clsx("rounded-full px-1.5 py-0.5 text-[10px] font-bold", active === t.key ? "bg-white/20 text-white" : "bg-black/5 text-zinc-600")}>{t.badge}</span>}
           </Link>
         ))}
       </nav>
@@ -110,9 +111,9 @@ export function TabNav({ tabs, active, base }: { tabs: { key: string; label: str
 /** GET arama/filtre formu. */
 export function FilterBar({ children, action }: { children: React.ReactNode; action?: string }) {
   return (
-    <form action={action} className="mb-4 flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-3 sm:flex-row sm:flex-wrap sm:items-center">
+    <form action={action} className="glass mb-4 flex flex-col gap-2 rounded-3xl p-3 sm:flex-row sm:flex-wrap sm:items-center">
       {children}
-      <button type="submit" className="h-10 rounded-lg bg-zinc-900 px-4 text-sm font-semibold text-white">
+      <button type="submit" className="h-10 rounded-full bg-zinc-900 px-5 text-sm font-semibold text-white">
         Filtrele
       </button>
     </form>
@@ -134,7 +135,7 @@ export function Pager({ page, pages, href }: { page: number; pages: number; href
             …
           </span>
         ) : (
-          <Link key={p} href={href(p)} className={clsx("grid h-9 min-w-9 place-items-center rounded-lg border px-2 text-sm font-medium", p === page ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 bg-white hover:border-zinc-400")}>
+          <Link key={p} href={href(p)} className={clsx("grid h-10 min-w-10 place-items-center rounded-full border px-3 text-sm font-medium", p === page ? "border-zinc-900 bg-zinc-900 text-white" : "border-white/80 bg-white/60 hover:bg-white")}>
             {p}
           </Link>
         ),
@@ -145,7 +146,7 @@ export function Pager({ page, pages, href }: { page: number; pages: number; href
 
 /** Masaüstünde tablo, mobilde kart görünümü için tablo kabı. */
 export function TableCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={clsx("overflow-hidden rounded-xl border border-zinc-200 bg-white", className)}>{children}</div>;
+  return <div className={clsx("glass overflow-hidden rounded-3xl", className)}>{children}</div>;
 }
 
 export const thCls = "px-4 py-3 text-left text-xs font-medium text-zinc-500";
@@ -166,13 +167,13 @@ export function KeyValue({ items }: { items: [string, React.ReactNode][] }) {
 
 export function Notice({ children, tone = "zinc" }: { children: React.ReactNode; tone?: "zinc" | "amber" | "green" | "blue" | "red" }) {
   const t = {
-    zinc: "border-zinc-200 bg-zinc-50 text-zinc-700",
+    zinc: "border-white/80 bg-white/60 text-zinc-700",
     amber: "border-amber-200 bg-amber-50 text-amber-900",
     green: "border-emerald-200 bg-emerald-50 text-emerald-900",
     blue: "border-sky-200 bg-sky-50 text-sky-900",
     red: "border-rose-200 bg-rose-50 text-rose-900",
   }[tone];
-  return <div className={clsx("rounded-xl border px-4 py-3 text-sm leading-relaxed", t)}>{children}</div>;
+  return <div className={clsx("rounded-2xl border px-4 py-3 text-sm leading-relaxed backdrop-blur", t)}>{children}</div>;
 }
 
 export const STATUS_BADGE: Record<string, { label: string; tone: "zinc" | "green" | "amber" | "red" | "blue" | "violet" }> = {

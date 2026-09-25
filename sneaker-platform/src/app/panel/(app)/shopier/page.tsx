@@ -38,7 +38,7 @@ export default async function ShopierPage({ searchParams }: PageProps<"/panel/sh
         description="Ödemeler Shopier güvenli ödeme altyapısıyla alınır; ürünler, stoklar ve siparişler Shopier ile iki yönlü senkronize edilir."
         actions={
           accounts.length > 0 && !showForm ? (
-            <Link href="/panel/shopier?duzenle=yeni" className="inline-flex h-10 items-center rounded-lg bg-zinc-900 px-4 text-sm font-semibold text-white">
+            <Link href="/panel/shopier?duzenle=yeni" className="inline-flex h-10 items-center rounded-full bg-zinc-900 px-4 text-sm font-semibold text-white">
               + Shopier hesabı ekle
             </Link>
           ) : null
@@ -51,7 +51,7 @@ export default async function ShopierPage({ searchParams }: PageProps<"/panel/sh
           ["2", "Ürün API'si", "Shopier > Hesabım > Kişisel Erişim Anahtarı (PAT) oluşturun. Ürün aktarımı, stok ve sipariş senkronu için gereklidir."],
           ["3", "Webhook", "Hesabı kaydettikten sonra 'Webhook kur' ile sipariş ve ürün değişiklikleri anında panele düşer."],
         ].map(([n, t, d]) => (
-          <div key={n} className="rounded-xl border border-zinc-200 bg-white p-4">
+          <div key={n} className="glass rounded-3xl p-4">
             <p className="flex items-center gap-2 font-semibold">
               <span className="grid h-6 w-6 place-items-center rounded-full bg-zinc-900 text-xs text-white">{n}</span> {t}
             </p>
@@ -88,7 +88,7 @@ export default async function ShopierPage({ searchParams }: PageProps<"/panel/sh
               description={a.shopSlug ? `shopier.com/${a.shopSlug}` : undefined}
               actions={
                 <div className="flex gap-2">
-                  <Link href={`/panel/shopier?duzenle=${a.id}`} className="grid h-9 w-9 place-items-center rounded-lg border border-zinc-300 hover:bg-zinc-50" title="Düzenle">
+                  <Link href={`/panel/shopier?duzenle=${a.id}`} className="grid h-9 w-9 place-items-center rounded-full border border-black/10 bg-white/70 hover:bg-white" title="Düzenle">
                     <Pencil size={15} />
                   </Link>
                   <ActionButton action={deleteShopierAccount.bind(null, a.id)} variant="danger" confirm={`${a.name} hesabı kaldırılsın mı? Bağlı sitelerin ödeme ayarı sıfırlanır.`}>
@@ -104,7 +104,7 @@ export default async function ShopierPage({ searchParams }: PageProps<"/panel/sh
                   <Status ok={Boolean(a.personalAccessToken)} label="Kişisel erişim anahtarı" />
                   <Status ok={a.productApiEnabled === true} pending={a.productApiEnabled == null} label="Ürün API erişimi" />
                   <Status ok={a.webhookIds.length > 0} label={`Webhook (${a.webhookIds.length})`} />
-                  {a.lastCheckMessage && <p className="rounded-lg bg-zinc-50 p-2 text-xs text-zinc-600">{a.lastCheckMessage}</p>}
+                  {a.lastCheckMessage && <p className="rounded-lg bg-white/40 p-2 text-xs text-zinc-600">{a.lastCheckMessage}</p>}
                   {a.lastCheckAt && <p className="text-xs text-zinc-400">Son kontrol: {formatDateTime(a.lastCheckAt)}</p>}
                 </div>
                 <div>
@@ -157,7 +157,7 @@ export default async function ShopierPage({ searchParams }: PageProps<"/panel/sh
 
       {logs.length > 0 && (
         <Card title="Senkron kayıtları" className="mt-6">
-          <ul className="divide-y divide-zinc-100 text-sm">
+          <ul className="divide-y divide-black/5 text-sm">
             {logs.map((l) => (
               <li key={l.id} className="flex flex-wrap items-start gap-3 py-2.5">
                 <Badge tone={l.status === "ok" ? "green" : l.status === "error" ? "red" : "zinc"}>{l.kind}</Badge>

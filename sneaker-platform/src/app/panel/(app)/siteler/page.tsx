@@ -25,9 +25,9 @@ export default async function SitesPage() {
       {sites.length === 0 ? (
         <Empty title="Henüz siten yok" description="İlk siteni oluştur; tema seç, alan adını bağla ve katalogdan ürün ekle." action={<ButtonLink href="/panel/siteler/yeni">Site Oluştur</ButtonLink>} />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div className="overflow-hidden glass rounded-3xl">
           <table className="w-full text-sm">
-            <thead className="bg-zinc-50 text-left text-xs text-zinc-500">
+            <thead className="bg-white/40 text-left text-xs text-zinc-500">
               <tr>
                 <th className="px-5 py-3 font-medium">Site</th>
                 <th className="hidden px-5 py-3 font-medium md:table-cell">Tema</th>
@@ -37,11 +37,11 @@ export default async function SitesPage() {
                 <th className="px-5 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100">
+            <tbody className="divide-y divide-black/5">
               {sites.map((s) => {
                 const url = siteUrl(s.slug, s.domains);
                 return (
-                  <tr key={s.id} className="hover:bg-zinc-50">
+                  <tr key={s.id} className="hover:bg-white/60">
                     <td className="px-5 py-4">
                       <Link href={`/panel/siteler/${s.id}`} className="font-semibold hover:underline">
                         {s.name}
@@ -66,13 +66,13 @@ export default async function SitesPage() {
                     <td className="hidden px-5 py-4 text-zinc-500 md:table-cell">{formatDate(s.createdAt)}</td>
                     <td className="px-5 py-4">
                       <div className="flex justify-end gap-2">
-                        <a href={`/panel/onizle/${s.slug}`} title="Önizle" className="grid h-8 w-8 place-items-center rounded-lg border border-zinc-300 hover:bg-white">
+                        <a href={`/panel/onizle/${s.slug}`} title="Önizle" className="grid h-8 w-8 place-items-center rounded-full border border-black/10 bg-white/70 hover:bg-white">
                           <Eye size={15} />
                         </a>
-                        <a href={url} target="_blank" rel="noopener noreferrer" title="Siteyi aç" className="grid h-8 w-8 place-items-center rounded-lg border border-zinc-300 hover:bg-white">
+                        <a href={url} target="_blank" rel="noopener noreferrer" title="Siteyi aç" className="grid h-8 w-8 place-items-center rounded-full border border-black/10 bg-white/70 hover:bg-white">
                           <ArrowUpRight size={15} />
                         </a>
-                        <Link href={`/panel/siteler/${s.id}`} className="inline-flex h-8 items-center rounded-lg bg-zinc-900 px-3 text-xs font-semibold text-white">
+                        <Link href={`/panel/siteler/${s.id}`} className="inline-flex h-8 items-center rounded-full bg-zinc-900 px-4 text-xs font-semibold text-white">
                           Yönet
                         </Link>
                       </div>

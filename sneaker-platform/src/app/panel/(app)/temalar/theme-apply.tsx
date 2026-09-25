@@ -13,7 +13,7 @@ export function ThemeApply({ theme, sites }: { theme: string; sites: { id: numbe
   if (!sites.length) return <p className="text-xs text-zinc-500">Temayı denemek için önce bir site oluştur.</p>;
   return (
     <div className="space-y-2">
-      <select value={siteId} onChange={(e) => setSiteId(Number(e.target.value))} className="h-9 w-full rounded-lg border border-zinc-300 bg-white px-2 text-sm">
+      <select value={siteId} onChange={(e) => setSiteId(Number(e.target.value))} className="h-9 w-full rounded-xl border border-black/10 bg-white px-2 text-sm">
         {sites.map((s) => (
           <option key={s.id} value={s.id}>
             {s.name}
@@ -25,7 +25,7 @@ export function ThemeApply({ theme, sites }: { theme: string; sites: { id: numbe
         <input type="checkbox" checked={colors} onChange={(e) => setColors(e.target.checked)} /> Temanın önerilen renklerini de uygula
       </label>
       <div className="grid grid-cols-2 gap-2">
-        <a href={site ? `/panel/onizle/${site.slug}?tema=${theme}` : "#"} className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-zinc-300 text-sm font-semibold hover:bg-zinc-50">
+        <a href={site ? `/panel/onizle/${site.slug}?tema=${theme}` : "#"} className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white/70 text-sm font-semibold hover:bg-white">
           <Eye size={14} /> Sitemde önizle
         </a>
         <button
@@ -38,7 +38,7 @@ export function ThemeApply({ theme, sites }: { theme: string; sites: { id: numbe
               setMsg(r.message);
             })
           }
-          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-900 text-sm font-semibold text-white disabled:opacity-40"
+          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-zinc-900 text-sm font-semibold text-white disabled:opacity-40"
         >
           {pending && <Loader2 size={14} className="animate-spin" />} {site?.theme === theme ? "Kullanılıyor" : "Uygula"}
         </button>

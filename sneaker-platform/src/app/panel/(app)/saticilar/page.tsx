@@ -43,11 +43,11 @@ export default async function MerchantsPage({ searchParams }: PageProps<"/panel/
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
         <div>
           <form className="mb-3">
-            <input name="q" defaultValue={q} placeholder="Satıcı adı veya e-posta ara" className="h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 text-sm" />
+            <input name="q" defaultValue={q} placeholder="Satıcı adı veya e-posta ara" className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm" />
           </form>
-          <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+          <div className="overflow-hidden glass rounded-3xl">
             <table className="w-full text-sm">
-              <thead className="hidden bg-zinc-50 text-left text-xs text-zinc-500 md:table-header-group">
+              <thead className="hidden bg-white/40 text-left text-xs text-zinc-500 md:table-header-group">
                 <tr>
                   <th className="px-4 py-3 font-medium">Satıcı</th>
                   <th className="px-4 py-3 font-medium">Paket</th>
@@ -55,9 +55,9 @@ export default async function MerchantsPage({ searchParams }: PageProps<"/panel/
                   <th className="hidden px-4 py-3 font-medium lg:table-cell">30 gün ciro</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-black/5">
                 {list.map(({ m, sites, products, revenue }) => (
-                  <tr key={m.id} className="hover:bg-zinc-50">
+                  <tr key={m.id} className="hover:bg-white/60">
                     <td className="px-4 py-3">
                       <Link href={`/panel/saticilar/${m.id}`} className="block">
                         <span className="flex items-center gap-2 font-semibold hover:underline">

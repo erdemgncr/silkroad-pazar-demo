@@ -18,6 +18,15 @@ Tek panelden sınırsız sneaker e-ticaret sitesi kurup yönetmeyi sağlayan Saa
   - Filtre URL'lerinde noindex; www ve alt alan adından 301 yönlendirme.
 - **Yasal sayfalar:** Mesafeli satış, ön bilgilendirme, KVKK, çerez ve üyelik sözleşmesi. Şirket bilgileriyle otomatik dolar ve panelden düzenlenebilir.
 
+### Kayıt ve kurulum sihirbazı
+- Tanıtım sayfası Shopier gibi sade: giriş/kayıt odaklı, mağaza adını yazıp **Hemen başla**.
+- **Kurulum sihirbazı** (`/panel/kayit`): Hesap → Mağaza (ad, adres, şehir) → Tasarım (10 tema + ana renk) → Ürünler (çok satanlar / marka-kategori seçimi / boş) → Paket → tek tıkla kurulum. Site, tema ve ürünler hazır olarak panele düşer.
+
+### Panel tasarımı
+- Aydınlık "liquid glass" arayüz, üst sekmeli gezinme, sağdan açılan profil menüsü; mobilde uygulama hissiyatında alt sekme çubuğu ve ortada yapay zeka küresi.
+- **Özelleştir** (`/panel/ozellestir`): Mağazanın tüm alanları tek ekranda; yazarak yönetim. Örnekler: "Tüm fiyatlara %5 zam yap", "Nike ürünlerinde %10 indirim", "1000 TL üzeri kargo bedava", "YAZ20 kodlu %20 kupon", "Temayı Luxe yap", "Stoksuz ürünleri gizle", "Havuzdan 20 adidas ürünü ekle". Değişiklik önce önizlenir, onayla uygulanır. Gemini anahtarı varsa serbest cümleler de anlaşılır.
+- **Katalog** (`/panel/katalog`): "Kadın Nike koşu ayakkabıları" gibi doğal dille arama, marka/kategori çipleri, görsel seçim ve tek tıkla "Mağazama ekle".
+
 ### Satıcı paneli
 - **Genel bakış:** Ciro ve sipariş trendi, kurulum adımları, çok satanlar, stoğu azalanlar.
 - **Site yönetimi:** Genel, ana sayfa (slider/banner/bölümler), iletişim ve şirket, kargo ve fiyat ayarı, SEO ve analitik, alan adları (DNS talimatı), ödeme (Shopier website index doluluğu), e-posta (SMTP ve test), sayfalar, blog, kopyala/sil.
